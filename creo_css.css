@@ -1,0 +1,54 @@
+html {
+    background: url("burnout_hires.jpg") no-repeat center center fixed; 
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+}
+
+#logo{
+    background-color: #000000;
+    background-color:rgba(0,0,0,0.5);
+    font-family: Helvetica;
+    color: white;
+    text-align: right;
+    border-radius: 5px;
+    position:absolute;
+    bottom:20px;
+    left:20px;
+    width:140px;  
+    /*padding-bottom:10px;*/
+    padding-right:20px;
+    padding-top:10px;
+}
+
+#functions {
+    background-color: #000000;
+    background-color:rgba(0,0,0,0.3);
+    font-family: Helvetica;
+    color: white;
+    border-radius: 5px;
+    position:absolute;
+    bottom:20px;
+    left:181px;
+    width:100%;
+    line-height:18px;
+    padding-top:10px;
+}
+
+/*#functions:hover{
+    background-color: #000000;
+    background-color:rgba(0,0,0,0.5);   
+} */
+
+/*ul{
+    list-style-type:none;
+}*/
+
+li:hover{
+    font-weight: bold;
+}
+
+div {
+    height:150px;
+}
