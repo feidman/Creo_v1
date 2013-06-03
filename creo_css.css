@@ -1,3 +1,4 @@
+/* ↓centers and scales the background image*/
 html {
     background: url("burnout_hires.jpg") no-repeat center center fixed; 
         -webkit-background-size: cover;
@@ -6,49 +7,24 @@ html {
         background-size: cover;
 }
 
-#logo{
-    background-color: #000000;
-    background-color:rgba(0,0,0,0.5);
-    font-family: Helvetica;
-    color: white;
-    text-align: right;
-    border-radius: 5px;
-    position:absolute;
-    bottom:20px;
-    left:20px;
-    width:140px;  
-    /*padding-bottom:10px;*/
-    padding-right:20px;
-    padding-top:10px;
+html,body{
+   margin:0;
+   padding:0;
+   height:100%;
 }
-
-#functions {
-    background-color: #000000;
-    background-color:rgba(0,0,0,0.3);
-    font-family: Helvetica;
-    color: white;
-    border-radius: 5px;
-    position:absolute;
-    bottom:20px;
-    left:181px;
-    width:100%;
-    line-height:18px;
-    padding-top:10px;
+#container {
+   min-height:100%;
+   position:relative;
 }
-
-/*#functions:hover{
-    background-color: #000000;
-    background-color:rgba(0,0,0,0.5);   
-} */
-
-/*ul{
-    list-style-type:none;
-}*/
-
-li:hover{
-    font-weight: bold;
+#window {
+   padding:10px;
+   padding-bottom:60px;   /* Height of the footer */
 }
-
-div {
-    height:150px;
+#menu {
+   position:absolute;
+   bottom:20px;
+   width:100%;
+   height:140px;   /* Height of the footer */
+   background-color:#000000;
+   background-color:rgba(0,0,0,0.5);
 }
