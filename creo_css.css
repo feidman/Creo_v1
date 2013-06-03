@@ -1,30 +1,42 @@
-/* ↓centers and scales the background image*/
-html {
-    background: url("burnout_hires.jpg") no-repeat center center fixed; 
+#window {
+   background:white;
+   background:rgba(255,255,255,0.1);
+}
+
+#scripts{
+    font-size:10px;    
+}
+
+#menu {
+   bottom:20px;  /*sets space of footer off bottom */
+   width:100%;
+   position:fixed;
+   background-color:#000000;
+   background-color:rgba(0,0,0,0.5);  
+   margin-left:10px;
+}
+
+#logo{
+    margin-left:25px;    
+}
+
+div{
+    color:white;
+    font-family: Century Gothic, Helvetica, Arial;
+    display:inline-block;
+    border-radius:5px;
+}
+
+li:hover{
+   font-weight:bold; 
+   color:gold;
+}
+
+html{
+   /*This section adds the centered and scaling background image*/
+   background: url("burnout_hires.jpg") no-repeat center center fixed; 
         -webkit-background-size: cover;
         -moz-background-size: cover;
         -o-background-size: cover;
         background-size: cover;
-}
-
-html,body{
-   margin:0;
-   padding:0;
-   height:100%;
-}
-#container {
-   min-height:100%;
-   position:relative;
-}
-#window {
-   padding:10px;
-   padding-bottom:60px;   /* Height of the footer */
-}
-#menu {
-   position:absolute;
-   bottom:20px;
-   width:100%;
-   height:140px;   /* Height of the footer */
-   background-color:#000000;
-   background-color:rgba(0,0,0,0.5);
 }
