@@ -1,6 +1,7 @@
 #window {
    background:white;
    background:rgba(255,255,255,0.1);
+   float:left;
 }
 
 #scripts{
@@ -12,7 +13,7 @@
    width:100%;
    position:fixed;
    background-color:#000000;
-   background-color:rgba(0,0,0,0.5);  
+   background-color:rgba(0,0,0,0.3);  
    margin-left:10px;
 }
 
@@ -20,16 +21,44 @@
     margin-left:25px;    
 }
 
+#howto{
+position:fixed;
+top:0;
+right:0;
+background-color:#000000;
+background-color:rgba(0,0,0,0.3);
+padding:10px;
+border-bottom-right-radius:0;
+border-top-right-radius:0;
+border-top-left-radius:0;
+}
+
+#howto_button {
+    background-color:#000000;
+    background-color:rgba(0,0,0,0.3);
+    /*float:right;*/
+    /*margin-right:-200;*/
+    /*margin-top:-200;*/
+    width:100px;
+    height:25px;
+    position:fixed;
+    top:0;
+    right:0;
+    border-bottom-right-radius:0;
+    border-top-right-radius:0;
+    border-top-left-radius:0;
+    text-align:center;
+}
+
+#howto a{
+    color:gold;
+}
+
 div{
     color:white;
     font-family: Century Gothic, Helvetica, Arial;
     display:inline-block;
     border-radius:5px;
-}
-
-li:hover{
-   font-weight:bold; 
-   color:gold;
 }
 
 html{
