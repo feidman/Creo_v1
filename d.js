@@ -2,10 +2,11 @@ $(document).ready(function(){
     //Fades in menus
     $('div').hide().fadeIn(2000); 
     $('#howto').hide();
-    //Fades out How-To menu after a while
-    // setTimeout(function() {
-    // $('#howto_button').fadeOut('fast');
-    // }, 10000);
+    //Fades out How-To menu after a while. Doesn't fade it out if How-To is open.
+    setTimeout(function() {
+        if($('#howto_button').text() == "How-To")
+            {$('#howto_button').fadeOut('fast')};
+            }, 10000);
     
     //Toggles the appearance of the list items - hover(on action, off action)
     $('li').hover(
@@ -19,17 +20,15 @@ $(document).ready(function(){
    
    //Changes the cursor to a pointer on hover over howto. I previously used a hover
    $('#howto_button').css('cursor','hand').css('cursor','pointer');
+   $('li').css('cursor','hand').css('cursor','pointer');
    
    $('#howto_button').click(function(){
-       $('#howto').slideToggle('slow', function(){      
-           if($('#howto_button').text() != "Hide"){
-           $('#howto_button').text("Hide");
-           $('#howto_button').css("background-color", "rgba(0,0,0,0)");
+        if($('#howto_button').text() != "Hide"){
+           $('#howto_button').text("Hide").css("background-color", "rgba(0,0,0,0)");
            }else{
-           $('#howto_button').text("How-To");
-           $('#howto_button').css("background-color", "rgba(0,0,0,0.5)");
+           $('#howto_button').text("How-To").css("background-color", "rgba(0,0,0,0.5)");
            }
-       });
+       $('#howto').slideToggle('fast');
    });
    
 });
