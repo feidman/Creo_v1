@@ -18,9 +18,8 @@ $(document).ready(function(){
         }
     );
    
-   //Changes the cursor to a pointer on hover over howto. I previously used a hover
-   $('#howto_button').css('cursor','hand').css('cursor','pointer');
-   $('li').css('cursor','hand').css('cursor','pointer');
+   $('#howto_button').css('cursor','pointer');
+   $('li').css('cursor','pointer');
    
    $('#howto_button').click(function(){
         if($('#howto_button').text() != "Hide"){
