@@ -7,13 +7,55 @@
         <script type="text/javascript" src="d.js"></script>
 	</head>
 	<body>
-            <!--<div id="window">WINDOW</div>-->
+            <div id=PROE_OUTPUT></div>
 
             <div id="howto">
                 <h3>Enabling Creo Superpowers</h3>
-                <p><b>1.</b> Change "web_enable_javascript" to "ON" in your "config.pro".</p>
-                <p><b>2.</b> Go to your Internet Explorer Options > Security > Custom Options.<br> 
-                Change "Initialize and Script ActiveX modules" and "Active Scripting" to "Enabled". </p>
+                <p><b>1.</b> Copy/Paste the below table to your config.pro:</p>
+                <p>
+                    <table>
+                      <thead>    
+                        <tr>
+                            <th>!Pro/Web.link Options</th>
+                            <th>Setting</th>
+                            <th>Description</th>
+                        </tr>
+                      </thead>
+                      
+                         <tr>
+                            <td>web_enable_javascript</td>
+                            <td>on</td>
+                            <td>!Enables Pro/Web.link</td>
+                        </tr>
+                         <tr>
+                            <td>web_link_proe_read</td>
+                            <td>yes</td>
+                            <td>!Lets web.link read from the CREO sessio</td>
+                        </tr>
+                        <tr>
+                            <td>web_link_proe_write</td>
+                            <td>yes</td>
+                            <td>!Lets web.link write to the CREO session</td>
+                        </tr>
+                          <tr>
+                            <td>web_link_file_read</td>
+                            <td>yes</td>
+                            <td>!Lets web.link write to the file system </td>
+                        </tr>
+                        <tr>
+                            <td>web_link_file_write</td>
+                            <td>yes</td>
+                            <td>!Lets web.link read the file system</td>
+                        </tr>                        
+                    </table>
+                </p>
+                <p><b>2.</b> Go to your Internet Explorer Options > Security > Trusted Sites and add this site.<br><br>
+                &nbspUnder "Custom Level" change the following:<br>
+                <!--<b>&nbspEnable</b> "Run ActiveX controls and plug-ins"<br>-->
+                <!--<b>&nbspEnable</b> "Download signed ActiveX controls"<br>-->
+                <b>&nbspPrompt</b> "Download unsigned ActiveX controls"<br>
+                <b>&nbspEnable</b> "Initialize and Script ActiveX modules"<br>
+                <!--<b>&nbspEnable</b> "Run ActiveX controls and plug-ins"</p>-->
                 <p><b>3.</b> Use the items below in the Pro-E integrated browser.</p>
                 <p><a href="mailto:dane.feagans@gmail.com">Email Me</a> at Dane.Feagans@gmail.com</p>
             </div>
@@ -23,8 +65,8 @@
                 <div id="logo"><b>Penske</b> CREO</div>
                 <div id="scripts">
                     <ul>
-                        <li>OPEN DRW OF CURRENT PRT</li>
-                        <li>CREATE DRW FOR CURRENT PRT</li>
+                        <li id="OpenDrw">OPEN DRW OF CURRENT PRT</li>
+                        <li id="CreateDrw">CREATE DRW FOR CURRENT PRT</li>
                         <li>CHECK COPY GEOM LINKS</li>
                         <li>AUTO EXPORT PDF AND DXF's</li>
                         
