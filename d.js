@@ -31,16 +31,16 @@ $(document).ready(function(){
    });
    
 //INITIALIZATION 
-var mGlob = pfcCreate("MpfcCOMGlobal"); //Makes connection to Pro-E
+var mGlob = new ActiveXObject("pfc.MpfcCOMGlobal"); //Makes connection to Pro-E
 var oSession = mGlob.GetProESession();  //Returns reference to current session to oSession
    
 //MAIN PROGRAM
    $('#OpenDrw').click(function(){
-        var CurModel = oSession.CurrentModel;
-        var CopyObjectFullName	= CurModel.FullName;
-        var ModelDescriptor = pfcCreate("pfcModelDescriptor");
-		var newModDescriptor = ModelDescriptor.Create (pfcCreate("pfcModelType").MDL_DRAWING, CopyObjectFullName  , null); 
-		try{
+       try{
+            var CurModel = oSession.CurrentModel;
+            var CopyObjectFullName	= CurModel.FullName;
+            var ModelDescriptor = new ActiveXObject("pfc.pfcModelDescriptor");
+            var newModDescriptor = ModelDescriptor.Create (new ActiveXObject("pfc.pfcModelType").MDL_DRAWING, CopyObjectFullName  , null); 
             var DrwWin = oSession.OpenFile(newModDescriptor);
             DrwWin.Activate ();
             oSession.CurrentWindow.SetBrowserSize(0.0); //Originally this like was first, but I don't want the window to hide unless it works
@@ -53,39 +53,5 @@ var oSession = mGlob.GetProESession();  //Returns reference to current session t
    $('#CreateDrw').click(function(){
        alert("In Development");
    });
-  
-  
-  
-  
-  
-  
-  
-  
-  
-//FUNCTIONS 
-//Checks if using windows   
-function pfcIsWindows () 
-{ 
-  if (navigator.appName.indexOf ("Microsoft") != -1) 
-    return true; 
-  else 
-    return false; 
-} 
- 
-//Function creates Pro/Web.Link objects for UNIX and Windows 
-function pfcCreate (className) 
-{ 
- if (!pfcIsWindows()) 
-   netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect"); 
- 
- if (pfcIsWindows()) 
-   return new ActiveXObject ("pfc."+className); 
- else 
- { 
-  ret = Components.classes ["@ptc.com/pfc/" +  
-            className + ";1"].createInstance(); 
-  return ret; 
- } 
-} 
    
 });
