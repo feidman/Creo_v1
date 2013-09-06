@@ -80,5 +80,5 @@ var oSession = mGlob.GetProESession();  //Returns reference to current session t
     document.getElementById("num_parts").innerHTML="Part Count: " + models_seq.Count;
     var  drw_seq = oSession.ListModelsByType(new ActiveXObject("pfc.pfcModelType").MDL_DRAWING);
     document.getElementById("num_drw").innerHTML="Drawing Count: " + drw_seq.Count;
-    document.getElementById("part_select").innerHTML=parts_seq.Item(1);
+    document.getElementById("part_select").innerHTML=parts_seq.Item(1).Filename;
 });
