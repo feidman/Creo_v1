@@ -36,8 +36,8 @@ var oSession = mGlob.GetProESession();  //Returns reference to current session t
    
 //MAIN PROGRAM
 
-    //OPENS THE DRW OF THE CURRENTLY OPENED PRT.
-    $('#OpenDrw').click(function(){
+//OPENS THE DRW OF THE CURRENTLY OPENED PRT.
+$('#OpenDrw').click(function(){
        try{
             var CopyObjectFullName = oSession.CurrentModel.FullName;
             var ModelDescriptor = new ActiveXObject("pfc.pfcModelDescriptor");
@@ -60,25 +60,9 @@ var oSession = mGlob.GetProESession();  //Returns reference to current session t
    });
    
    //CREATES A DRW OF THE CURRENTLY OPENED PRT
-   $('#CreateDrw').click(function(){
-        var  CAD_Models= oSession.ListModelsByType(new ActiveXObject("pfc.pfcModelType").MDL_PART);  //Returns all the CAD models in-session... not the ones in the workspace.
-        alert(CAD_Models.Count);
-        var  Parts = oSession.ListModels();  //returns all the models (both prts and asms in session.)
-        alert(Parts.Count);
-         var  Drawings= oSession.ListModelsByType(new ActiveXObject("pfc.pfcModelType").MDL_DRAWING);  //Returns only the drawings in session.
-        alert(Drawings.Count);
-        // Below is trying to get the sequence selection to work.
-        //var dwg_one = Drawings.Item(1);
-        // alert(dwg_one);
-   });
+   $('#ExportDrw').click(function(){
+    var server_name = oSession.GetServerByUrl("http://pdm.prnet.us/Windchill");    
+    document.getElementById("part_select").innerHTML = "Server Name 1: " + pfcServer.Alias;
+    });
    
-       
-   //This is to try and get a list of all the parts in the workspace:
-    var  parts_seq= oSession.ListModelsByType(new ActiveXObject("pfc.pfcModelType").MDL_PART);  //Returns all the CAD models in-session... not the ones in the workspace.
-    document.getElementById("num_models").innerHTML="Model Count: " + parts_seq.Count;
-    var  models_seq = oSession.ListModels();  //returns all the models (both prts and asms in session.)
-    document.getElementById("num_parts").innerHTML="Part Count: " + models_seq.Count;
-    var  drw_seq = oSession.ListModelsByType(new ActiveXObject("pfc.pfcModelType").MDL_DRAWING);
-    document.getElementById("num_drw").innerHTML="Drawing Count: " + drw_seq.Count;
-    document.getElementById("part_select").innerHTML=parts_seq.Item(1).Filename;
 });
