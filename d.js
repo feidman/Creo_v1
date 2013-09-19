@@ -61,8 +61,13 @@ $('#OpenDrw').click(function(){
    
    //CREATES A DRW OF THE CURRENTLY OPENED PRT
    $('#ExportDrw').click(function(){
-    var server_name = oSession.GetServerByUrl("http://pdm.prnet.us/Windchill");    
-    document.getElementById("part_select").innerHTML = "Server Name 1: " + pfcServer.Alias;
+
+    var server_handle = oSession.GetActiveServer(); //This works with the methods (result of method): .ActiveWorkspace (REPORT), .Location (http://pdm.prnet.us/Windchill),  .isActive (true), .Version (10.1), CollectWorkspaces().Count
+    var open_options = new ActiveXObject("pfc.pfcFileListOpt").FILE_LIST_LATEST;
+    var dir = "wtws://" + server_handle.Alias + "/" + server_handle.ActiveWorkspace;
+    document.getElementById("num_models").innerHTML = "Directory: " + dir;
+    var files_seq = oSession.ListFiles("*.*",open_options,dir); //This correctly lists all files in the "REPORT" workspace, but I want it to be dynamic
+    document.getElementById("part_select").innerHTML = "# of Parts: " + files_seq.Count;
     });
    
 });
