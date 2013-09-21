@@ -66,7 +66,7 @@ $('#OpenDrw').click(function(){
     var open_options = new ActiveXObject("pfc.pfcFileListOpt").FILE_LIST_LATEST;
     var dir = "wtws://" + server_handle.Alias + "/" + server_handle.ActiveWorkspace;
     document.getElementById("num_models").innerHTML = "Directory: " + dir;
-    var files_seq = oSession.ListFiles("*.*",open_options,dir); //This correctly lists all files in the "REPORT" workspace, but I want it to be dynamic
+    var files_seq = oSession.ListFiles("*.*",open_options,dir);
     document.getElementById("part_select").innerHTML = "# of Parts: " + files_seq.Count;
     });
    
