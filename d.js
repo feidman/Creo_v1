@@ -37,7 +37,7 @@ var oSession = mGlob.GetProESession();  //Returns reference to current session t
 //MAIN PROGRAM
 
 //OPENS THE DRW OF THE CURRENTLY OPENED PRT.
-$('#OpenDrw').click(function(){
+    $('#OpenDrw').click(function(){
        try{
             var CopyObjectFullName = oSession.CurrentModel.FullName;
             var ModelDescriptor = new ActiveXObject("pfc.pfcModelDescriptor");
@@ -59,15 +59,31 @@ $('#OpenDrw').click(function(){
         }
    });
    
-   //CREATES A DRW OF THE CURRENTLY OPENED PRT
+//CREATES A DRW OF THE CURRENTLY OPENED PRT
    $('#ExportDrw').click(function(){
 
     var server_handle = oSession.GetActiveServer(); //This works with the methods (result of method) .ActiveWorkspace (REPORT), .Location (http://pdm.prnet.us/Windchill),  .isActive (true), .Version (10.1), CollectWorkspaces().Count
     var open_options = new ActiveXObject("pfc.pfcFileListOpt").FILE_LIST_LATEST;
     var dir = "wtws://" + server_handle.Alias + "/" + server_handle.ActiveWorkspace;
+    var files_seq = oSession.ListFiles("*.drw",open_options,dir);   //Loop through the actual part names using .Count to determine how many and .item(i) to return the full filename for each one. example returned is wtws://pdm10/BodyFix/delete.drw
     document.getElementById("num_models").innerHTML = "Directory: " + dir;
-    var files_seq = oSession.ListFiles("*.*",open_options,dir);
-    //document.getElementById("part_select").innerHTML = "# of Parts: " + files_seq.Count;
+    document.getElementById("num_parts").innerHTML = "Number of DRWs: " + files_seq.Count;
+    document.getElementById("num_drw").innerHTML = "Empty: ";
+    document.getElementById("part_select").innerHTML = "Test Drw: wtws://pdm10/BodyFix/delete.drw";
     });
-   
+
+//JUST SPITS OUT THE DXF OF THE A HARDCODED DXF. WILL SOON BE APPLIED TO DYNAMICALLY EXPORT AN ENTIRE LIST.
+    var target_file = "wtws://pdm10/BodyFix/delete.drw";
+    document.getElementById("num_models").innerHTML = "Active Workspace must be BodyFix";
+    document.getElementById("num_parts").innerHTML = "It must contain a delete.drw";
+    document.getElementById("num_drw").innerHTML = "Target File: " + target_file;
+    $('div').css('color', 'black'); //This is just so that text is readable when I have the background turned off. Delete for final product.
+
+    var export_pdf = new ActiveXObject("pfc.pfcPDFExportInstructions").Create();
+    var pdf_settings = new ActiveXObject("pfc.pfcPDFOptions");
+    var pdf_option = new ActiveXObject("pfc.pfcPDFOption").Create();
+    pdf_option.OptionType = "PDFOPT_LAUNCH_VIEWER";
+    pdf_option.OptionValue = false;
+    oSession.CurrentModel.Export("WSDFSDJKLF",export_pdf);
+
 });
