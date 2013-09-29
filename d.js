@@ -73,17 +73,19 @@ var oSession = mGlob.GetProESession();  //Returns reference to current session t
     });
 
 //JUST SPITS OUT THE DXF OF THE A HARDCODED DXF. WILL SOON BE APPLIED TO DYNAMICALLY EXPORT AN ENTIRE LIST.
-    var target_file = "wtws://pdm10/BodyFix/delete.drw";
-    document.getElementById("num_models").innerHTML = "Active Workspace must be BodyFix";
-    document.getElementById("num_parts").innerHTML = "It must contain a delete.drw";
-    document.getElementById("num_drw").innerHTML = "Target File: " + target_file;
     $('div').css('color', 'black'); //This is just so that text is readable when I have the background turned off. Delete for final product.
 
-    var export_pdf = new ActiveXObject("pfc.pfcPDFExportInstructions").Create();
+    var export_pdf = new ActiveXObject("pfc.pfcPDFExportInstructions").Create();    
+
     var pdf_settings = new ActiveXObject("pfc.pfcPDFOptions");
-    var pdf_option = new ActiveXObject("pfc.pfcPDFOption").Create();
-    pdf_option.OptionType = "PDFOPT_LAUNCH_VIEWER";
-    pdf_option.OptionValue = false;
-    oSession.CurrentModel.Export("WSDFSDJKLF",export_pdf);
+    var setting = new ActiveXObject("pfc.pfcPDFOption");
+
+    var test_setting = setting.Create();
+    test_setting.OptionType = new ActiveXObject("pfc.pfcPDFOptionType").PDFOPT_LAUNCH_VIEWER;
+    test_setting.OptionValue = new ActiveXObject("pfc.MpfcArgument").CreateBoolArgValue(false);   //The documentation mentions the method .setOptionValue, leaving out set made it work for me.
+
+    pdf_settings.Append(test_setting); //Test to see if I can append on a basic option
+    export_pdf.Options = pdf_settings;
+    oSession.CurrentModel.Export("WIN_Name.pdf",export_pdf);
 
 });
