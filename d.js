@@ -84,8 +84,13 @@ var oSession = mGlob.GetProESession();  //Returns reference to current session t
     test_setting.OptionType = new ActiveXObject("pfc.pfcPDFOptionType").PDFOPT_LAUNCH_VIEWER;
     test_setting.OptionValue = new ActiveXObject("pfc.MpfcArgument").CreateBoolArgValue(false);   //The documentation mentions the method .setOptionValue, leaving out set made it work for me.
 
-    pdf_settings.Append(test_setting); //Test to see if I can append on a basic option
-    export_pdf.Options = pdf_settings;
-    oSession.CurrentModel.Export("WIN_Name.pdf",export_pdf);
+    var color_setting = setting.Create();
+    color_setting.OptionType = new ActiveXObject("pfc.pfcPDFOptionType").PDFOPT_COLOR_DEPTH;
+    color_setting.OptionValue = new ActiveXObject("pfc.pfcPDFColorDepth").PDF_CD_MONO;   //The documentation mentions the method .setOptionValue, leaving out set made it work for me.
 
+    pdf_settings.Append(test_setting); 
+    pdf_settings.Append(color_setting); 
+    export_pdf.Options = pdf_settings;
+  
+    oSession.CurrentModel.Export("test.pdf",export_pdf);
 });
