@@ -84,13 +84,23 @@ var oSession = mGlob.GetProESession();  //Returns reference to current session t
     test_setting.OptionType = new ActiveXObject("pfc.pfcPDFOptionType").PDFOPT_LAUNCH_VIEWER;
     test_setting.OptionValue = new ActiveXObject("pfc.MpfcArgument").CreateBoolArgValue(false);   //The documentation mentions the method .setOptionValue, leaving out set made it work for me.
 
-    var color_setting = setting.Create();
-    color_setting.OptionType = new ActiveXObject("pfc.pfcPDFOptionType").PDFOPT_COLOR_DEPTH;
-    color_setting.OptionValue = new ActiveXObject("pfc.pfcPDFColorDepth").PDF_CD_MONO;   //The documentation mentions the method .setOptionValue, leaving out set made it work for me.
+//    var color_setting = setting.Create();
+//    color_setting.OptionType = new ActiveXObject("pfc.pfcPDFOptionType").PDFOPT_COLOR_DEPTH;
+//    color_setting.OptionValue = new ActiveXObject("pfc.pfcPDFColorDepth").PDF_CD_MONO;   //The documentation mentions the method .setOptionValue, leaving out set made it work for me.
 
     pdf_settings.Append(test_setting); 
-    pdf_settings.Append(color_setting); 
+//    pdf_settings.Append(color_setting); 
     export_pdf.Options = pdf_settings;
-  
-    oSession.CurrentModel.Export("test.pdf",export_pdf);
+ 
+
+
+//I HAVE BEEN ABLE TO PRINT A PDF OF AN ACTIVE DRAWING, THE BELOW ATTEMPTS TO RETRIEVE A DRAWING USING IT'S NAME.
+    var target_drw = "delete.drw";
+    var targetDescriptor = new ActiveXObject("pfc.pfcModelDescriptor");
+    var target_descr = targetDescriptor.Create(new ActiveXObject("pfc.pfcModelType").MDL_DRAWING, target_drw, null);   
+    var target = oSession.RetrieveModel(target_descr);   //There are other ways to get models, possibly easier using GetModelByName("delete.drw"); etc. that probably make Pro-E do some of the work.
+
+    target.Display();   //You have to display the drawing to actually export the PDF.
+    target.Export("test.pdf",export_pdf);
+    target.Erase();     //This clears it afterwards out of memory. Could use EraseWithDependencies() too.
 });
