@@ -62,45 +62,41 @@ var oSession = mGlob.GetProESession();  //Returns reference to current session t
 //CREATES A DRW OF THE CURRENTLY OPENED PRT
    $('#ExportDrw').click(function(){
 
-    var server_handle = oSession.GetActiveServer(); //This works with the methods (result of method) .ActiveWorkspace (REPORT), .Location (http://pdm.prnet.us/Windchill),  .isActive (true), .Version (10.1), CollectWorkspaces().Count
-    var open_options = new ActiveXObject("pfc.pfcFileListOpt").FILE_LIST_LATEST;
-    var dir = "wtws://" + server_handle.Alias + "/" + server_handle.ActiveWorkspace;
-    var files_seq = oSession.ListFiles("*.drw",open_options,dir);   //Loop through the actual part names using .Count to determine how many and .item(i) to return the full filename for each one. example returned is wtws://pdm10/BodyFix/delete.drw
-    document.getElementById("num_models").innerHTML = "Directory: " + dir;
-    document.getElementById("num_parts").innerHTML = "Number of DRWs: " + files_seq.Count;
-    document.getElementById("num_drw").innerHTML = "Empty: ";
-    document.getElementById("part_select").innerHTML = "Test Drw: wtws://pdm10/BodyFix/delete.drw";
+       var ServerHandle = oSession.GetActiveServer();
+       var OpenOptions = new ActiveXObject("pfc.pfcFileListOpt").FILE_LIST_LATEST;
+       var Dir = "wtws://" + ServerHandle.Alias + "/" + ServerHandle.ActiveWorkspace;
+       var DrwSeq = oSession.ListFiles("*.drw",OpenOptions,Dir); //This gives you a Pro-E "sequence" of pfcModel objects, easily accessed using the .item(i) method.
+       
+       var ExportPDF = new ActiveXObject("pfc.pfcPDFExportInstructions").Create();           
+       var SettingsPDF = new ActiveXObject("pfc.pfcPDFOptions");
+       var SettingFactory = new ActiveXObject("pfc.pfcPDFOption");
+
+       //The below creates the setting that stops Pro-E from opening the PDF viewer when it saves a PDF.
+       var SettingViewerOFF = SettingFactory.Create();
+       SettingViewerOFF.OptionType = new ActiveXObject("pfc.pfcPDFOptionType").PDFOPT_LAUNCH_VIEWER;
+       SettingViewerOFF.OptionValue = new ActiveXObject("pfc.MpfcArgument").CreateBoolArgValue(false);   //The documentation mentions the method .setOptionValue, leaving out set made it work for me.
+       SettingsPDF.Append(SettingViewerOFF); 
+
+       //The below creates the setting to make the colors black and white, by default it's color.
+       //    var ColorSetting = SettingFactory.Create();
+       //    ColorSetting.OptionType = new ActiveXObject("pfc.pfcPDFOptionType").PDFOPT_COLOR_DEPTH;
+       //    ColorSetting.OptionValue = new ActiveXObject("pfc.pfcPDFColorDepth").PDF_CD_MONO;   //The documentation mentions the method .setOptionValue, leaving out set made it work for me.
+       //    SettingsPDF.Append(color_setting); 
+
+       ExportPDF.Options = SettingsPDF;
+
+alert('Running');
+
+       //Combine the below into just an openfile using DrwSeq.item(i) and then Erase().
+//    var target_drw = "delete.drw";
+//    var targetDescriptor = new ActiveXObject("pfc.pfcModelDescriptor");
+//    var target_descr = targetDescriptor.Create(new ActiveXObject("pfc.pfcModelType").MDL_DRAWING, target_drw, null);   
+//    var target = oSession.RetrieveModel(target_descr);   //There are other ways to get models, possibly easier using GetModelByName("delete.drw"); etc. that probably make Pro-E do some of the work.
+//    target.Display();   //You have to display the drawing to actually export the PDF.
+//    target.Export("test.pdf",ExportPDF);
+//    target.Erase();     //This clears it afterwards out of memory. Could use EraseWithDependencies() too.
+
     });
 
-//JUST SPITS OUT THE DXF OF THE A HARDCODED DXF. WILL SOON BE APPLIED TO DYNAMICALLY EXPORT AN ENTIRE LIST.
     $('div').css('color', 'black'); //This is just so that text is readable when I have the background turned off. Delete for final product.
-
-    var export_pdf = new ActiveXObject("pfc.pfcPDFExportInstructions").Create();    
-
-    var pdf_settings = new ActiveXObject("pfc.pfcPDFOptions");
-    var setting = new ActiveXObject("pfc.pfcPDFOption");
-
-    var test_setting = setting.Create();
-    test_setting.OptionType = new ActiveXObject("pfc.pfcPDFOptionType").PDFOPT_LAUNCH_VIEWER;
-    test_setting.OptionValue = new ActiveXObject("pfc.MpfcArgument").CreateBoolArgValue(false);   //The documentation mentions the method .setOptionValue, leaving out set made it work for me.
-
-//    var color_setting = setting.Create();
-//    color_setting.OptionType = new ActiveXObject("pfc.pfcPDFOptionType").PDFOPT_COLOR_DEPTH;
-//    color_setting.OptionValue = new ActiveXObject("pfc.pfcPDFColorDepth").PDF_CD_MONO;   //The documentation mentions the method .setOptionValue, leaving out set made it work for me.
-
-    pdf_settings.Append(test_setting); 
-//    pdf_settings.Append(color_setting); 
-    export_pdf.Options = pdf_settings;
- 
-
-
-//I HAVE BEEN ABLE TO PRINT A PDF OF AN ACTIVE DRAWING, THE BELOW ATTEMPTS TO RETRIEVE A DRAWING USING IT'S NAME.
-    var target_drw = "delete.drw";
-    var targetDescriptor = new ActiveXObject("pfc.pfcModelDescriptor");
-    var target_descr = targetDescriptor.Create(new ActiveXObject("pfc.pfcModelType").MDL_DRAWING, target_drw, null);   
-    var target = oSession.RetrieveModel(target_descr);   //There are other ways to get models, possibly easier using GetModelByName("delete.drw"); etc. that probably make Pro-E do some of the work.
-
-    target.Display();   //You have to display the drawing to actually export the PDF.
-    target.Export("test.pdf",export_pdf);
-    target.Erase();     //This clears it afterwards out of memory. Could use EraseWithDependencies() too.
 });
