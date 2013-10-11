@@ -78,10 +78,10 @@ var oSession = mGlob.GetProESession();  //Returns reference to current session t
        SettingsPDF.Append(SettingViewerOFF); 
 
        //The below creates the setting to make the colors black and white, by default it's color.
-       //    var ColorSetting = SettingFactory.Create();
-       //    ColorSetting.OptionType = new ActiveXObject("pfc.pfcPDFOptionType").PDFOPT_COLOR_DEPTH;
-       //    ColorSetting.OptionValue = new ActiveXObject("pfc.pfcPDFColorDepth").PDF_CD_MONO;   //The documentation mentions the method .setOptionValue, leaving out set made it work for me.
-       //    SettingsPDF.Append(color_setting); 
+       var ColorSetting = SettingFactory.Create();
+       ColorSetting.OptionType = new ActiveXObject("pfc.pfcPDFOptionType").PDFOPT_COLOR_DEPTH;
+       ColorSetting.OptionValue = new ActiveXObject("pfc.MpfcArgument").CreateIntArgValue(new ActiveXObject("pfc.pfcPDFColorDepth").PDF_CD_MONO);
+       SettingsPDF.Append(ColorSetting); 
 
        ExportPDF.Options = SettingsPDF;
 
