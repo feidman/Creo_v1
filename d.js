@@ -129,3 +129,23 @@ var DescFromPart = function (DrawingName) {
 var ShortName = function (fullname) {
     return fullname.slice(fullname.lastIndexOf("/")+1,fullname.length-4);
 };
+
+
+//This function returns the directory the file should be move to, based on it's part number (example: PRS-P-... would be placed in the P-Pedals folder)
+var dirTarget = function (partNumber) {
+    var targetFolder = "\\\thea\\DavWWWRoot\\Engineering\\PRS\\aero\\Drawings\\";
+
+    if (partNumber is a full scale part) {
+	THEN PARSE IT USING A FULL-SCALE PART SPECIFIC METHOD
+	dirTarget += "whatever";
+    }
+    else if (partNumber is a model scale partn) {
+	THEN PARSE IT USING A MODEL PART SPECIFIC METHOD
+	dirTarget += "whatever";
+    }
+    else {
+	IT IS NOT PARSABLE AND RETURN "NOT EXPORTING"
+	dirTarget += "whaterver";
+    }
+
+};
