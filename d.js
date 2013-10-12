@@ -1,3 +1,8 @@
+//INITIALIZE CONNECTION TO PRO-E (They are located he to get global access to oSession object.
+var mGlob = new ActiveXObject("pfc.MpfcCOMGlobal"); //Makes connection to Pro-E
+var oSession = mGlob.GetProESession();  //Returns reference to current session to oSession
+
+
 $(document).ready(function(){
     //Fades in menus
     $('div').hide().fadeIn(1000);
@@ -29,11 +34,7 @@ $(document).ready(function(){
            }
        $('#howto').slideToggle('fast');
    });
-   
-//INITIALIZE CONNECTION TO PRO-E
-var mGlob = new ActiveXObject("pfc.MpfcCOMGlobal"); //Makes connection to Pro-E
-var oSession = mGlob.GetProESession();  //Returns reference to current session to oSession
-   
+     
 //MAIN PROGRAM
 
 //OPENS THE DRW OF THE CURRENTLY OPENED PRT.
@@ -65,7 +66,7 @@ var oSession = mGlob.GetProESession();  //Returns reference to current session t
        var ServerHandle = oSession.GetActiveServer();
        var OpenOptions = new ActiveXObject("pfc.pfcFileListOpt").FILE_LIST_LATEST;
        var Dir = "wtws://" + ServerHandle.Alias + "/" + ServerHandle.ActiveWorkspace;
-       var DrwSeq = oSession.ListFiles("*.drw",OpenOptions,Dir); //This gives you a Pro-E "sequence" of pfcModel objects, easily accessed using the .item(i) method.
+       var DrwSeq = oSession.ListFiles("*.drw",OpenOptions,Dir); //This gives you a Pro-E "sequence" of strings. Each item, accessed using .Item(i) is the string.
        
        var ColorPDF = new ActiveXObject("pfc.pfcPDFExportInstructions").Create();           
        var MonoPDF = new ActiveXObject("pfc.pfcPDFExportInstructions").Create();           
@@ -80,7 +81,7 @@ var oSession = mGlob.GetProESession();  //Returns reference to current session t
        SettingsColor.Append(SettingViewerOFF); 
        SettingsMono.Append(SettingViewerOFF); 
 
-       //The below creates the setting to make the colors black and white, by default it's color.
+       //The below creates the setting to make the colors black and white. By default it's color, so I only have to add the Mono seting to the SettingsMono object.
        var ColorSetting = OptionFactory.Create();
        ColorSetting.OptionType = new ActiveXObject("pfc.pfcPDFOptionType").PDFOPT_COLOR_DEPTH;
        ColorSetting.OptionValue = new ActiveXObject("pfc.MpfcArgument").CreateIntArgValue(new ActiveXObject("pfc.pfcPDFColorDepth").PDF_CD_MONO);
@@ -89,7 +90,8 @@ var oSession = mGlob.GetProESession();  //Returns reference to current session t
        MonoPDF.Options = SettingsMono;
        ColorPDF.Options = SettingsColor;
 
-alert('Running');
+//alert(DescFromPart("PCWTA317"));
+alert(DescFromPart("engine_sla"));  
 
        //Combine the below into just an openfile using DrwSeq.item(i) and then Erase().
 //    var target_drw = "delete.drw";
@@ -104,3 +106,26 @@ alert('Running');
 
     $('div').css('color', 'black'); //This is just so that text is readable when I have the background turned off. Delete for final product.
 });
+
+
+
+
+
+
+//Our Drawings don't utilize the drawing description parameter, instead it's drawn from the part that's used in the drw.
+//This function takes the partnumber, such as "PR13WT45C111" and returns the description from the .prt with that name as a string.
+//If it can't find the part to open, then it will return "UNAVAILABLE"
+
+var DescFromPart = function (DrawingName) {
+    try{
+	var DescriptorFactory = new ActiveXObject("pfc.pfcModelDescriptor");
+	var PartDescript = DescriptorFactory.Create (new ActiveXObject("pfc.pfcModelType").MDL_PART, DrawingName , null); 
+	var DrwPart = oSession.RetrieveModel(PartDescript);
+
+	var Desc = DrwPart.GetParam("DESCRIPTION");
+	return Desc.Value.StringValue;
+    }
+    catch(err){
+	return "NOT AVAILABLE";
+    }
+};
