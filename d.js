@@ -67,23 +67,27 @@ var oSession = mGlob.GetProESession();  //Returns reference to current session t
        var Dir = "wtws://" + ServerHandle.Alias + "/" + ServerHandle.ActiveWorkspace;
        var DrwSeq = oSession.ListFiles("*.drw",OpenOptions,Dir); //This gives you a Pro-E "sequence" of pfcModel objects, easily accessed using the .item(i) method.
        
-       var ExportPDF = new ActiveXObject("pfc.pfcPDFExportInstructions").Create();           
-       var SettingsPDF = new ActiveXObject("pfc.pfcPDFOptions");
-       var SettingFactory = new ActiveXObject("pfc.pfcPDFOption");
+       var ColorPDF = new ActiveXObject("pfc.pfcPDFExportInstructions").Create();           
+       var MonoPDF = new ActiveXObject("pfc.pfcPDFExportInstructions").Create();           
+       var SettingsMono = new ActiveXObject("pfc.pfcPDFOptions");
+       var SettingsColor = new ActiveXObject("pfc.pfcPDFOptions");
+       var OptionFactory = new ActiveXObject("pfc.pfcPDFOption");
 
        //The below creates the setting that stops Pro-E from opening the PDF viewer when it saves a PDF.
-       var SettingViewerOFF = SettingFactory.Create();
+       var SettingViewerOFF = OptionFactory.Create();
        SettingViewerOFF.OptionType = new ActiveXObject("pfc.pfcPDFOptionType").PDFOPT_LAUNCH_VIEWER;
        SettingViewerOFF.OptionValue = new ActiveXObject("pfc.MpfcArgument").CreateBoolArgValue(false);   //The documentation mentions the method .setOptionValue, leaving out set made it work for me.
-       SettingsPDF.Append(SettingViewerOFF); 
+       SettingsColor.Append(SettingViewerOFF); 
+       SettingsMono.Append(SettingViewerOFF); 
 
        //The below creates the setting to make the colors black and white, by default it's color.
-       var ColorSetting = SettingFactory.Create();
+       var ColorSetting = OptionFactory.Create();
        ColorSetting.OptionType = new ActiveXObject("pfc.pfcPDFOptionType").PDFOPT_COLOR_DEPTH;
        ColorSetting.OptionValue = new ActiveXObject("pfc.MpfcArgument").CreateIntArgValue(new ActiveXObject("pfc.pfcPDFColorDepth").PDF_CD_MONO);
-       SettingsPDF.Append(ColorSetting); 
+       SettingsMono.Append(ColorSetting); 
 
-       ExportPDF.Options = SettingsPDF;
+       MonoPDF.Options = SettingsMono;
+       ColorPDF.Options = SettingsColor;
 
 alert('Running');
 
