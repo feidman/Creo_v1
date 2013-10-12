@@ -90,8 +90,7 @@ $(document).ready(function(){
        MonoPDF.Options = SettingsMono;
        ColorPDF.Options = SettingsColor;
 
-//alert(DescFromPart("PCWTA317"));
-alert(DescFromPart("engine_sla"));  
+       alert(DescFromPart(ShortName(DrwSeq.Item(1))));  
 
        //Combine the below into just an openfile using DrwSeq.item(i) and then Erase().
 //    var target_drw = "delete.drw";
@@ -106,10 +105,6 @@ alert(DescFromPart("engine_sla"));
 
     $('div').css('color', 'black'); //This is just so that text is readable when I have the background turned off. Delete for final product.
 });
-
-
-
-
 
 
 //Our Drawings don't utilize the drawing description parameter, instead it's drawn from the part that's used in the drw.
@@ -128,4 +123,9 @@ var DescFromPart = function (DrawingName) {
     catch(err){
 	return "NOT AVAILABLE";
     }
+};
+
+//This function is intended to parse the filename string returned by the ListFile function. Example "wtws://pdm10/Workspace/test_part.drw" would be trimmed to "test_part"
+var ShortName = function (fullname) {
+    return fullname.slice(fullname.lastIndexOf("/")+1,fullname.length-4);
 };
