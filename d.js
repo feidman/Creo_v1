@@ -133,19 +133,39 @@ var ShortName = function (fullname) {
 
 //This function returns the directory the file should be move to, based on it's part number (example: PRS-P-... would be placed in the P-Pedals folder)
 var dirTarget = function (partNumber) {
-    var targetFolder = "\\\thea\\DavWWWRoot\\Engineering\\PRS\\aero\\Drawings\\";
 
-    if (partNumber is a full scale part) {
-	THEN PARSE IT USING A FULL-SCALE PART SPECIFIC METHOD
-	dirTarget += "whatever";
+    //This defines the root locations for the parts (FS, Model, or Desktop)
+//    var targetFS = "\" + "\thea\avWWWRoot\Engineering\PRS\aero\Drawings\";
+//    var targetModel = "X:\StockCar\NASCAR Engineering\Design\Design Database\Scale Model\Drawings";
+//    var targetDesktop = "DesktopDirector";
+
+    //This defines the critical character in the filename (zero based, so 0 is the first character).
+
+    var critFSLetter = partNumber.substr(4,1).toUpperCase();
+    var critModelLetter = partNumber.substr(8,1).toUpperCase();
+
+    //These are calculated here to save the multiple calculations it took to include them in the if structure.
+    //The crit*Ascii determines the ascii codes for later checks that it's an actual letter.
+    var critFSAscii = critFSLetter.charCodeAt(0);
+    var critModelAscii = critModelLetter.charCodeAt(0);
+    var partLength = partNumber.length;
+
+    //The first check is for FS parts and ensures the crit character is a letter and the 
+    if (critFSAscii<91 && critFSAscii>64 && partLength<18 && partLength>15) {
+	//THEN PARSE critFSLetter USING A FULL-SCALE PART SPECIFIC METHOD
+//	return targetFS + "appropriate_dir";
+	return "FS";
     }
-    else if (partNumber is a model scale partn) {
-	THEN PARSE IT USING A MODEL PART SPECIFIC METHOD
-	dirTarget += "whatever";
+    else if (critModelAscii<91 && critModelAscii>64 && partLength<14 && partLength>11) {
+	//THEN PARSE critModelLetter USING A MODEL PART SPECIFIC METHOD
+//	return targetModel + "appropriate_dir";
+	return "Model";
     }
     else {
 	IT IS NOT PARSABLE AND RETURN "NOT EXPORTING"
-	dirTarget += "whaterver";
+//	return targetDesktop;
+	return "Desktop";
     }
 
 };
+
