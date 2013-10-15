@@ -142,6 +142,7 @@ var dirTarget = function (partNumber) {
 
     var critFSLetter = partNumber.substr(4,1).toUpperCase();
     var critModelLetter = partNumber.substr(8,1).toUpperCase();
+    var firstThreeChars = partNumber.substr(0,3).toUpperCase();
 
     //These are calculated here to save the multiple calculations it took to include them in the if structure.
     //The crit*Ascii determines the ascii codes for later checks that it's an actual letter.
@@ -149,12 +150,13 @@ var dirTarget = function (partNumber) {
     var critModelAscii = critModelLetter.charCodeAt(0);
     var partLength = partNumber.length;
 
+console.log(firstThreeChars);
     //The first check is for FS parts and ensures the crit character is a letter and the
-    if (critFSAscii<91 && critFSAscii>64 && partLength<18 && partLength>15) {
+    if (firstThreeChars==="PRS" && critFSAscii<91 && critFSAscii>64 && partLength<18 && partLength>15) {
 	//THEN PARSE critFSLetter USING A FULL-SCALE PART SPECIFIC METHOD
 	return targetFS + "FS - Full Scale";
     }
-    else if (critModelAscii<91 && critModelAscii>64 && partLength<14 && partLength>11) {
+    else if (firstThreeChars==="PR1" && critModelAscii<91 && critModelAscii>64 && partLength<14 && partLength>11) {
 	//THEN PARSE critModelLetter USING A MODEL PART SPECIFIC METHOD
 	return targetModel + "MS - Model Scale";
     }
