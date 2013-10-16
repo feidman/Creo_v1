@@ -3,6 +3,8 @@ $(document).ready(function(){
     $('div').hide().fadeIn(1000);
     $('#howto').hide();
 
+    alert(modelDirs["A"]);
+
     //Fades out How-To menu after a while. Doesn't fade it out if How-To is open.
     setTimeout(function() {
 	if($('#howto_button').text() === "How-To")
@@ -133,12 +135,11 @@ function ShortName (fullname) {
 function dirTarget (partNumber) {
 
     //This defines the root locations for the parts (FS, Model, or Desktop)
-    var targetFS = "\\\\thea\\avWWWRoot\\Engineering\\PRS\\aero\\Drawings\\";
-    var targetModel = "X:\\StockCar\\NASCAR Engineering\\Design\\Design Database\\Scale Model\\Drawings";
+    var targetFS = "\\\\thea\\DavWWWRoot\\Engineering\\PRS\\aero\\Drawings\\";
+    var targetModel = "X:\\StockCar\\NASCAR Engineering\\Design\\Design Database\\Scale Model\\Drawings- WTM\\";
     var targetDesktop = "DesktopDirectory";
 
     //This defines the critical character in the filename (zero based, so 0 is the first character).
-
     var critFSLetter = partNumber.substr(4,1).toUpperCase();
     var critModelLetter = partNumber.substr(8,1).toUpperCase();
     var firstThreeChars = partNumber.substr(0,3).toUpperCase();
@@ -149,14 +150,64 @@ function dirTarget (partNumber) {
     var critModelAscii = critModelLetter.charCodeAt(0);
     var partLength = partNumber.length;
 
+    //These are bjects used instead of a switch case to determine the appropriate target folder based on the critical identified letter in the partnumber. They will return the target using modelDirs["A"] for example.
+    var modelDirs = {
+	'A':'A Aero',
+	'B':'B Brakes',
+	'C':'C Chassis',
+	'D':'D Dampers',
+	'E':'E Electronics and Instrumentation',
+	'F':'F Front Suspension',
+	'G':'G Gear Train',
+	'H':'H Hardware',
+	'I':'I Engine and GearBox',
+	'J':'J Jigs and Hardware',
+	'M':'M Data Acquisiton',
+	'O':'O Oil System',
+	'P':'P Pedals',
+	'R':'R Rear Suspension',
+	'S':'S Steering',
+	'T':'T Tools',
+	'U':'U Fuel',
+	'V':'V Vendor Parts',
+	'W':'W Cooling System',
+	'X':'X Research and Development',
+	'Y':'Y Template Fixtures',
+	'Z':'Z Hardware'
+    };
+
+    var fsDirs = {
+	'A':'A Aero',
+	'B':'B Brakes',
+	'C':'C Chassis',
+	'D':'D Dampers',
+	'E':'E Electronics and Instrumentation',
+	'F':'F Front Suspension',
+	'H':'H Hardware',
+	'J':'J Jigs and Hardware',
+	'M':'M Data Acquisiton',
+	'O':'O Oil System',
+	'P':'P Pedals',
+	'Q':'Q MFG',
+	'R':'R Rear Suspension',
+	'S':'S Steering',
+	'T':'T Tools',
+	'U':'U Fuel',
+	'V':'V Vendor Parts',
+	'W':'W Cooling System',
+	'X':'X Research and Development',
+	'Y':'Y Template Fixtures',
+	'Z':'Z Schemes'
+    };
+
     //The first check is for FS parts and ensures the crit character is a letter and the
     if (firstThreeChars==="PRS" && critFSAscii<91 && critFSAscii>64 && partLength<18 && partLength>15) {
 	//THEN PARSE critFSLetter USING A FULL-SCALE PART SPECIFIC METHOD
-	return targetFS + "FS - Full Scale";
+	return targetFS + fsDirs[critFSLetter];
     }
     else if (firstThreeChars==="PR1" && critModelAscii<91 && critModelAscii>64 && partLength<14 && partLength>11) {
 	//THEN PARSE critModelLetter USING A MODEL PART SPECIFIC METHOD
-	return targetModel + "MS - Model Scale";
+	return targetModel + modelDirs[critModelLetter];
     }
     else {
 	//IT IS NOT PARSABLE AND RETURN "NOT EXPORTING"
