@@ -1,11 +1,8 @@
-//INITIALIZE CONNECTION TO PRO-E (They are located he to get global access to oSession object.
-var mGlob = new ActiveXObject("pfc.MpfcCOMGlobal"); //Makes connection to Pro-E
-var oSession = mGlob.GetProESession();  //Returns reference to current session to oSession
-
 $(document).ready(function(){
     //Fades in menus
     $('div').hide().fadeIn(1000);
     $('#howto').hide();
+
     //Fades out How-To menu after a while. Doesn't fade it out if How-To is open.
     setTimeout(function() {
 	if($('#howto_button').text() === "How-To")
@@ -22,30 +19,34 @@ $(document).ready(function(){
 	}
     );
 
-   $('#howto_button').css('cursor','pointer');
-   $('li').css('cursor','pointer');
+    $('#howto_button').css('cursor','pointer');
+    $('li').css('cursor','pointer');
 
-   $('#howto_button').click(function(){
-       if($('#howto_button').text() != "Hide"){
-	   $('#howto_button').text("Hide").css("background-color", "rgba(0,0,0,0)");
-       }else{
-	   $('#howto_button').text("How-To").css("background-color", "rgba(0,0,0,0.5)");
-       }
-       $('#howto').slideToggle('fast');
-   });
+    $('#howto_button').click(function(){
+	if($('#howto_button').text() != "Hide"){
+	    $('#howto_button').text("Hide").css("background-color", "rgba(0,0,0,0)");
+	}else{
+	    $('#howto_button').text("How-To").css("background-color", "rgba(0,0,0,0.5)");
+	}
+	$('#howto').slideToggle('fast');
+    });
+
+//INITIALIZE CONNECTION TO PRO-E
+var mGlob = new ActiveXObject("pfc.MpfcCOMGlobal"); //Makes connection to Pro-E
+var oSession = mGlob.GetProESession();  //Returns reference to current session to oSession
 
 //MAIN PROGRAM
 
 //OPENS THE DRW OF THE CURRENTLY OPENED PRT.
     $('#OpenDrw').click(function(){
-       try{
-	    var CopyObjectFullName = oSession.CurrentModel.FullName;
-	    var ModelDescriptor = new ActiveXObject("pfc.pfcModelDescriptor");
-	    var newModDescriptor = ModelDescriptor.Create (new ActiveXObject("pfc.pfcModelType").MDL_DRAWING, CopyObjectFullName  , null);
-	    var DrwWin = oSession.OpenFile(newModDescriptor);
-	    oSession.CurrentWindow.SetBrowserSize(0.0); //Originally this was first, but I don't want the window to hide unless it works
-	    DrwWin.Activate();
-		}
+	try{
+	   var CopyObjectFullName = oSession.CurrentModel.FullName;
+	   var ModelDescriptor = new ActiveXObject("pfc.pfcModelDescriptor");
+	   var newModDescriptor = ModelDescriptor.Create (new ActiveXObject("pfc.pfcModelType").MDL_DRAWING, CopyObjectFullName  , null);
+	   var DrwWin = oSession.OpenFile(newModDescriptor);
+	   oSession.CurrentWindow.SetBrowserSize(0.0); //Originally this was first, but I don't want the window to hide unless it works
+	   DrwWin.Activate();
+	}
 	catch(err){
 	    if (err.number == "-2147352567")  //this number is the error code for "file not found"
 	    {
@@ -54,10 +55,10 @@ $(document).ready(function(){
 		// Options.Append(new ActiveXObject("pfc.pfcDrawingCreateOptions").DRAWINGCREATE_WRITE_ERROR_FILE);
 		// var DrawingModel = oSession.GetModel(CopyObjectFullName, new ActiveXObject("pfc.pfcModelType").MDL_ASSEMBLY);
 		// var NewDwg = oSession.CreateDrawingFromTemplate("TEST_DRW","a0_drawing",DrawingModel.Descr, Options);
-	    alert("Do you want to create a DRW for this part?");
+		alert("Do you want to create a DRW for this part?");
 	    }
 	}
-   });
+    });
 
 //CREATES A DRW OF THE CURRENTLY OPENED PRT
    $('#ExportDrw').click(function(){
@@ -100,11 +101,10 @@ $(document).ready(function(){
 //    target.Export("test.pdf",ExportPDF);
 //    target.Erase();     //This clears it afterwards out of memory. Could use EraseWithDependencies() too.
 
-    });
+   });
 
     $('div').css('color', 'black'); //This is just so that text is readable when I have the background turned off. Delete for final product.
 });
-
 
 //Our Drawings don't utilize the drawing description parameter, instead it's drawn from the part that's used in the drw.
 //This function takes the partnumber, such as "PR13WT45C111" and returns the description from the .prt with that name as a string.
@@ -129,7 +129,6 @@ var ShortName = function (fullname) {
     return fullname.slice(fullname.lastIndexOf("/")+1,fullname.length-4);
 };
 
-
 //This function returns the directory the file should be move to, based on it's part number (example: PRS-P-... would be placed in the P-Pedals folder)
 var dirTarget = function (partNumber) {
 
@@ -150,7 +149,6 @@ var dirTarget = function (partNumber) {
     var critModelAscii = critModelLetter.charCodeAt(0);
     var partLength = partNumber.length;
 
-console.log(firstThreeChars);
     //The first check is for FS parts and ensures the crit character is a letter and the
     if (firstThreeChars==="PRS" && critFSAscii<91 && critFSAscii>64 && partLength<18 && partLength>15) {
 	//THEN PARSE critFSLetter USING A FULL-SCALE PART SPECIFIC METHOD
