@@ -110,7 +110,7 @@ var oSession = mGlob.GetProESession();  //Returns reference to current session t
 //This function takes the partnumber, such as "PR13WT45C111" and returns the description from the .prt with that name as a string.
 //If it can't find the part to open, then it will return "UNAVAILABLE"
 
-var DescFromPart = function (DrawingName) {
+function DescFromPart (DrawingName) {
     try{
 	var DescriptorFactory = new ActiveXObject("pfc.pfcModelDescriptor");
 	var PartDescript = DescriptorFactory.Create (new ActiveXObject("pfc.pfcModelType").MDL_PART, DrawingName , null);
@@ -122,15 +122,15 @@ var DescFromPart = function (DrawingName) {
     catch(err){
 	return "NOT AVAILABLE";
     }
-};
+}
 
 //This function is intended to parse the filename string returned by the ListFile function. Example "wtws://pdm10/Workspace/test_part.drw" would be trimmed to "test_part"
-var ShortName = function (fullname) {
+function ShortName (fullname) {
     return fullname.slice(fullname.lastIndexOf("/")+1,fullname.length-4);
-};
+}
 
 //This function returns the directory the file should be move to, based on it's part number (example: PRS-P-... would be placed in the P-Pedals folder)
-var dirTarget = function (partNumber) {
+function dirTarget (partNumber) {
 
     //This defines the root locations for the parts (FS, Model, or Desktop)
     var targetFS = "\\\\thea\\avWWWRoot\\Engineering\\PRS\\aero\\Drawings\\";
@@ -163,4 +163,4 @@ var dirTarget = function (partNumber) {
 	return targetDesktop;
     }
 
-};
+}
