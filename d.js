@@ -95,14 +95,14 @@ var oSession = mGlob.GetProESession();  //Returns reference to current session t
        var numDrws = DrwSeq.Count;
        for (var i = 0; i < numDrws; i++) {
 	   var currentDrw = ShortName(DrwSeq.Item(i));
-	   var dataRow = {
-	       id: i,
-	       partNumber: currentDrw,
-	       description: DescFromPart(currentDrw),
-	       directory: dirTarget(currentDrw) 
-	   };
-	   TableData.push(dataRow);
-	   alert("ID: " + dataRow.id + "partNumber: " + dataRow.partNumber + "Desc: " + dataRow.description + "Dir: " + dataRow.directory);
+	   TableData.push(
+	       {
+		   id: i,
+		   partNumber: currentDrw,
+		   description: DescFromPart(currentDrw),
+		   directory: dirTarget(currentDrw) 
+	       }
+	   );
        }
 
        //Combine the below into just an openfile using DrwSeq.item(i) and then Erase().
