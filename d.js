@@ -3,8 +3,6 @@ $(document).ready(function(){
     $('div').hide().fadeIn(1000);
     $('#howto').hide();
 
-    alert(modelDirs["A"]);
-
     //Fades out How-To menu after a while. Doesn't fade it out if How-To is open.
     setTimeout(function() {
 	if($('#howto_button').text() === "How-To")
@@ -92,7 +90,20 @@ var oSession = mGlob.GetProESession();  //Returns reference to current session t
        MonoPDF.Options = SettingsMono;
        ColorPDF.Options = SettingsColor;
 
-       alert(DescFromPart(ShortName(DrwSeq.Item(1))));
+       //This section constructs an array full of each row of the selection table.
+       var TableData = [];
+       var numDrws = DrwSeq.Count;
+       for (var i = 0; i < numDrws; i++) {
+	   var currentDrw = ShortName(DrwSeq.Item(i));
+	   var dataRow = {
+	       id: i,
+	       partNumber: currentDrw,
+	       description: DescFromPart(currentDrw),
+	       directory: dirTarget(currentDrw) 
+	   };
+	   TableData.push(dataRow);
+	   alert("ID: " + dataRow.id + "partNumber: " + dataRow.partNumber + "Desc: " + dataRow.description + "Dir: " + dataRow.directory);
+       }
 
        //Combine the below into just an openfile using DrwSeq.item(i) and then Erase().
 //    var target_drw = "delete.drw";
@@ -131,7 +142,7 @@ function ShortName (fullname) {
     return fullname.slice(fullname.lastIndexOf("/")+1,fullname.length-4);
 }
 
-//This function returns the directory the file should be move to, based on it's part number (example: PRS-P-... would be placed in the P-Pedals folder)
+//This function returns the directory the file should be move to, based on it's part number (example: PRS-P-... would be placed in the P-Pedals folder). If it doesn't recognize it as a model part or FS part, it puts it on te desktop.
 function dirTarget (partNumber) {
 
     //This defines the root locations for the parts (FS, Model, or Desktop)
