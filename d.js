@@ -1,8 +1,3 @@
-//INITIALIZE CONNECTION TO PRO-E (mGlob and oSession are global for use in the DescFromPart function.
-var mGlob = new ActiveXObject("pfc.MpfcCOMGlobal"); //Makes connection to Pro-E
-var oSession = mGlob.GetProESession();  //Returns reference to current session to oSession
-
-//SHEET BEHAVIOR
 $(document).ready(function(){
     //Fades in menus
     $('div').hide().fadeIn(1000);
@@ -35,6 +30,10 @@ $(document).ready(function(){
 	}
 	$('#howto').slideToggle('fast');
     });
+
+//INITIALIZE CONNECTION TO PRO-E (The window. is javascript syntax to make mGlob and oSession global for use in the DescFromPart function since it's a function decleration its intepreted before this line is ran, so oSession would otherwise be out of scope of DescFromPart.
+window.mGlob = new ActiveXObject("pfc.MpfcCOMGlobal"); //Makes connection to Pro-E
+window.oSession = mGlob.GetProESession();  //Returns reference to current session to oSession
 
 //MAIN PROGRAM
 
