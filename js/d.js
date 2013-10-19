@@ -31,6 +31,40 @@ $(document).ready(function(){
 	$('#howto').slideToggle('fast');
     });
 
+
+
+    //jqGrid Debugging (This is just a test data set to prove functionality)
+    $("#ProEOutput").jqGrid({
+	datatype: "local",
+	height: 250,
+	colNames:['Inv No','Date', 'Client', 'Amount','Tax','Total','Notes'],
+	colModel:[
+	    {name:'id',index:'id', width:60, sorttype:"int"},
+	    {name:'invdate',index:'invdate', width:90, sorttype:"date"},
+	    {name:'name',index:'name', width:100},
+	    {name:'amount',index:'amount', width:80, align:"right",sorttype:"float"},
+	    {name:'tax',index:'tax', width:80, align:"right",sorttype:"float"},
+	    {name:'total',index:'total', width:80,align:"right",sorttype:"float"},
+	    {name:'note',index:'note', width:150, sortable:false}
+	],
+	multiselect: true,
+	caption: "Drawings in Current Workspace"
+    });
+    var mydata = [
+	{id:"1",invdate:"PRS-A-9203-011-A",name:"Front Clip Bar",note:"note",amount:"200.00",tax:"10.00",total:"210.00"},
+	{id:"2",invdate:"PRS-A-9203-011-A",name:"Chassis Downtube",note:"note2",amount:"300.00",tax:"20.00",total:"320.00"},
+	{id:"3",invdate:"PRS-A-9203-011-A",name:"Revised Undertube",note:"note3",amount:"400.00",tax:"30.00",total:"430.00"},
+	{id:"4",invdate:"PRS-A-9203-011-A",name:"Elimination",note:"note",amount:"200.00",tax:"10.00",total:"210.00"},
+	{id:"5",invdate:"PRS-A-9203-011-A",name:"SDflksjdfl",note:"note2",amount:"300.00",tax:"20.00",total:"320.00"},
+	{id:"6",invdate:"PRS-A-9203-011-A",name:"sdfkojasdklj",note:"note3",amount:"400.00",tax:"30.00",total:"430.00"},
+	{id:"7",invdate:"PRS-A-9203-011-A",name:"Exhaust Hanger",note:"note",amount:"200.00",tax:"10.00",total:"210.00"},
+	{id:"8",invdate:"PRS-A-9203-011-A",name:"LCA Vpbrace ",note:"note2",amount:"300.00",tax:"20.00",total:"320.00"},
+	{id:"9",invdate:"PRS-A-9203-011-A",name:"Final Test Part",note:"note3",amount:"400.00",tax:"30.00",total:"430.00"}
+    ];
+    for(var i=0;i<=mydata.length;i++)
+	$("#ProEOutput").jqGrid('addRowData',i+1,mydata[i]);
+
+
 //INITIALIZE CONNECTION TO PRO-E (The window. is javascript syntax to make mGlob and oSession global for use in the DescFromPart function since it's a function decleration its intepreted before this line is ran, so oSession would otherwise be out of scope of DescFromPart.
 window.mGlob = new ActiveXObject("pfc.MpfcCOMGlobal"); //Makes connection to Pro-E
 window.oSession = mGlob.GetProESession();  //Returns reference to current session to oSession
