@@ -31,37 +31,22 @@ $(document).ready(function(){
 	$('#howto').slideToggle('fast');
     });
 
-    //jqGrid Debugging (This is just a test data set to prove functionality)
+    //jqGrid Definition
     $("#ProEOutput").jqGrid({
 	datatype: "local",
 	height: 220,
-	colNames:['Inv No','Part Number', 'Description', 'Model Volume','Model Mass','Total','Notes'],
+	colNames:['ID','Part Number', 'Description', 'Target Directory'],
 	colModel:[
-	    {name:'id',index:'id', width:10, sorttype:"int"},
-	    {name:'invdate',index:'invdate', width:120, sorttype:"date"},
-	    {name:'name',index:'name', width:120},
-	    {name:'amount',index:'amount', width:80, align:"right",sorttype:"float"},
-	    {name:'tax',index:'tax', width:80, align:"right",sorttype:"float"},
-	    {name:'total',index:'total', width:80,align:"right",sorttype:"float"},
-	    {name:'note',index:'note', width:150, sortable:false}
+	    {name:'id',index:'id', width:15, sorttype:"int"},
+	    {name:'partNumber',index:'partNumber', width:120, sorttype:"int"},
+	    {name:'description',index:'description', width:400, sorttype:"int"},
+	    {name:'directory',index:'directory', width:550}
 	],
 	multiselect: true,
 	caption: "Drawings in Current Workspace"
     });
-    var mydata = [
-	{id:"1",invdate:"PRS-A-9203-011-A",name:"Front Clip Bar",note:"note",amount:"200.00",tax:"10.00",total:"210.00"},
-	{id:"2",invdate:"PRS-A-9203-011-A",name:"Chassis Downtube",note:"note2",amount:"300.00",tax:"20.00",total:"320.00"},
-	{id:"3",invdate:"PRS-A-9203-011-A",name:"Revised Undertube",note:"note3",amount:"400.00",tax:"30.00",total:"430.00"},
-	{id:"4",invdate:"PRS-A-9203-011-A",name:"Boom Tube- RH",note:"note",amount:"200.00",tax:"10.00",total:"210.00"},
-	{id:"5",invdate:"PRS-A-9203-011-A",name:"Boom Tube - LH",note:"note2",amount:"300.00",tax:"20.00",total:"320.00"},
-	{id:"6",invdate:"PRS-A-9203-011-A",name:"X-pipe V17",note:"note3",amount:"400.00",tax:"30.00",total:"430.00"},
-	{id:"7",invdate:"PRS-A-9203-011-A",name:"Exhaust Hanger",note:"note",amount:"200.00",tax:"10.00",total:"210.00"},
-	{id:"8",invdate:"PRS-A-9203-011-A",name:"LCA V-brace ",note:"note2",amount:"300.00",tax:"20.00",total:"320.00"},
-	{id:"9",invdate:"PRS-A-9203-011-A",name:"Final Test Part",note:"note3",amount:"400.00",tax:"30.00",total:"430.00"}
-    ];
-    for(var i=0;i<=mydata.length;i++)
-	$("#ProEOutput").jqGrid('addRowData',i+1,mydata[i]);
 
+    $("#ProEOutput").jqGrid('setGridState','hidden');
 
 //INITIALIZE CONNECTION TO PRO-E (The window. is javascript syntax to make mGlob and oSession global for use in the DescFromPart function since it's a function decleration its intepreted before this line is ran, so oSession would otherwise be out of scope of DescFromPart.
 window.mGlob = new ActiveXObject("pfc.MpfcCOMGlobal"); //Makes connection to Pro-E
@@ -137,6 +122,11 @@ window.oSession = mGlob.GetProESession();  //Returns reference to current sessio
 	   );
        }
 
+       $('#ProEOutput').jqGrid('clearGridData');   //Clears the grid before repopulating it.
+       $("#ProEOutput").jqGrid('setGridState','visible');
+       for(var i=0;i<=TableData.length;i++)
+	   $("#ProEOutput").jqGrid('addRowData',i+1,TableData[i]);
+       
        //Combine the below into just an openfile using DrwSeq.item(i) and then Erase().
 //    var target_drw = "delete.drw";
 //    var targetDescriptor = new ActiveXObject("pfc.pfcModelDescriptor");
