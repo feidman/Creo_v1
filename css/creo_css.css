@@ -75,12 +75,9 @@ div{
 
 html{
    /*This section adds the centered and scaling background image*/
-
-/* THIS PART WAS COMMENTED TO SAVE BANDWIDTH, THERE'S NO NEED TO SEND THIS BIG PICTURE
    background: url("../pic/burnout_hires.jpg") no-repeat center center fixed; 
         -webkit-background-size: cover;
         -moz-background-size: cover;
         -o-background-size: cover;
         background-size: cover;
-*/
 }
