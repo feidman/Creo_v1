@@ -34,19 +34,22 @@ $(document).ready(function(){
     //jqGrid Definition
     $("#ProEOutput").jqGrid({
 	datatype: "local",
-	height: 220,
+	height: 'auto',
+	width: 1250,
+	rowNum: 250,      //This sets the max number of rows possible, if this wasn't here sorting the files shrinks it down to the default 20 vis
 	colNames:['ID','Part Number', 'Description', 'Target Directory'],
 	colModel:[
 	    {name:'id',index:'id', width:15, sorttype:"int"},
-	    {name:'partNumber',index:'partNumber', width:120, sorttype:"int"},
-	    {name:'description',index:'description', width:400, sorttype:"int"},
-	    {name:'directory',index:'directory', width:550}
+	    {name:'partNumber',index:'partNumber', width:120},
+	    {name:'description',index:'description', width:350},
+	    {name:'directory',index:'directory', width:630}
 	],
 	multiselect: true,
-	caption: "Drawings in Current Workspace"
+	caption: " "
     });
 
     $("#ProEOutput").jqGrid('setGridState','hidden');
+    $("#ProEOutput").parents('div.ui-jqgrid-bdiv').css("max-height","540px");
 
 //INITIALIZE CONNECTION TO PRO-E (The window. is javascript syntax to make mGlob and oSession global for use in the DescFromPart function since it's a function decleration its intepreted before this line is ran, so oSession would otherwise be out of scope of DescFromPart.
 window.mGlob = new ActiveXObject("pfc.MpfcCOMGlobal"); //Makes connection to Pro-E
@@ -114,7 +117,7 @@ window.oSession = mGlob.GetProESession();  //Returns reference to current sessio
 	   var currentDrw = ShortName(DrwSeq.Item(i));
 	   TableData.push(
 	       {
-		   id: i,
+		   id: i+1,
 		   partNumber: currentDrw,
 		   description: DescFromPart(currentDrw),
 		   directory: dirTarget(currentDrw) 
@@ -122,6 +125,7 @@ window.oSession = mGlob.GetProESession();  //Returns reference to current sessio
 	   );
        }
 
+       jQuery("#ProEOutput").jqGrid('setCaption',"Drawings in Current Workspace");
        $('#ProEOutput').jqGrid('clearGridData');   //Clears the grid before repopulating it.
        $("#ProEOutput").jqGrid('setGridState','visible');
        for(var i=0;i<=TableData.length;i++)
