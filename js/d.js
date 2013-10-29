@@ -128,9 +128,9 @@ window.oSession = mGlob.GetProESession();  //Returns reference to current sessio
        jQuery("#ProEOutput").jqGrid('setCaption',"Drawings in Current Workspace");
        $('#ProEOutput').jqGrid('clearGridData');   //Clears the grid before repopulating it.
        $("#ProEOutput").jqGrid('setGridState','visible');
-       for(var i=0;i<=TableData.length;i++)
-	   $("#ProEOutput").jqGrid('addRowData',i+1,TableData[i]);
-       
+       for(var i=0;i<TableData.length;i++)
+	   $("#ProEOutput").jqGrid('addRowData',TableData[i].id,TableData[i]);
+
        //Combine the below into just an openfile using DrwSeq.item(i) and then Erase().
 //    var target_drw = "delete.drw";
 //    var targetDescriptor = new ActiveXObject("pfc.pfcModelDescriptor");
