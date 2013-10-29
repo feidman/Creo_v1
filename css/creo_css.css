@@ -18,6 +18,12 @@
    margin-left:10px;
 }
 
+#pdfApprove {
+    background-color:#000000;
+    background-color:rgba(0,0,0,0.75);  
+    width:100px;
+    text-align:center;
+}
 #logo{
     margin-left:25px;    
     display:inline-block;

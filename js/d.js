@@ -2,6 +2,7 @@ $(document).ready(function(){
     //Fades in menus
     $('div').hide().fadeIn(1000);
     $('#howto').hide();
+    $('#pdfApprove').hide();
 
     //Fades out How-To menu after a while. Doesn't fade it out if How-To is open.
     setTimeout(function() {
@@ -88,28 +89,6 @@ window.oSession = mGlob.GetProESession();  //Returns reference to current sessio
        var Dir = "wtws://" + ServerHandle.Alias + "/" + ServerHandle.ActiveWorkspace;
        var DrwSeq = oSession.ListFiles("*.drw",OpenOptions,Dir); //This gives you a Pro-E "sequence" of strings. Each item, accessed using .Item(i) is the string.
 
-       var ColorPDF = new ActiveXObject("pfc.pfcPDFExportInstructions").Create();
-       var MonoPDF = new ActiveXObject("pfc.pfcPDFExportInstructions").Create();
-       var SettingsMono = new ActiveXObject("pfc.pfcPDFOptions");
-       var SettingsColor = new ActiveXObject("pfc.pfcPDFOptions");
-       var OptionFactory = new ActiveXObject("pfc.pfcPDFOption");
-
-       //The below creates the setting that stops Pro-E from opening the PDF viewer when it saves a PDF.
-       var SettingViewerOFF = OptionFactory.Create();
-       SettingViewerOFF.OptionType = new ActiveXObject("pfc.pfcPDFOptionType").PDFOPT_LAUNCH_VIEWER;
-       SettingViewerOFF.OptionValue = new ActiveXObject("pfc.MpfcArgument").CreateBoolArgValue(false);   //The documentation mentions the method .setOptionValue, leaving out set made it work for me.
-       SettingsColor.Append(SettingViewerOFF);
-       SettingsMono.Append(SettingViewerOFF);
-
-       //The below creates the setting to make the colors black and white. By default it's color, so I only have to add the Mono seting to the SettingsMono object.
-       var ColorSetting = OptionFactory.Create();
-       ColorSetting.OptionType = new ActiveXObject("pfc.pfcPDFOptionType").PDFOPT_COLOR_DEPTH;
-       ColorSetting.OptionValue = new ActiveXObject("pfc.MpfcArgument").CreateIntArgValue(new ActiveXObject("pfc.pfcPDFColorDepth").PDF_CD_MONO);
-       SettingsMono.Append(ColorSetting);
-
-       MonoPDF.Options = SettingsMono;
-       ColorPDF.Options = SettingsColor;
-
        //This section constructs an array full of each row of the selection table.
        var TableData = [];
        var numDrws = DrwSeq.Count;
@@ -127,11 +106,11 @@ window.oSession = mGlob.GetProESession();  //Returns reference to current sessio
 
        jQuery("#ProEOutput").jqGrid('setCaption',"Drawings in Current Workspace");
        $('#ProEOutput').jqGrid('clearGridData');   //Clears the grid before repopulating it.
-       $("#ProEOutput").jqGrid('setGridState','visible');
        for(var i=0;i<TableData.length;i++)
 	   $("#ProEOutput").jqGrid('addRowData',TableData[i].id,TableData[i]);
+       $("#ProEOutput").jqGrid('setGridState','visible');
+       $("#pdfApprove").show();
 
-       //Combine the below into just an openfile using DrwSeq.item(i) and then Erase().
 //    var target_drw = "delete.drw";
 //    var targetDescriptor = new ActiveXObject("pfc.pfcModelDescriptor");
 //    var target_descr = targetDescriptor.Create(new ActiveXObject("pfc.pfcModelType").MDL_DRAWING, target_drw, null);
@@ -140,6 +119,51 @@ window.oSession = mGlob.GetProESession();  //Returns reference to current sessio
 //    target.Export("test.pdf",ExportPDF);
 //    target.Erase();     //This clears it afterwards out of memory. Could use EraseWithDependencies() too.
 
+   });
+
+   $('#pdfApprove').click(function(){
+       var selectedRows = jQuery("#ProEOutput").jqGrid('getGridParam','selarrrow');
+       var numSelected = selectedRows.length;
+
+       //Only creates this stuff if anything was selected AKA selection count is greater than 0.
+       if (numSelected > 0){
+
+	   //This section before the for loop creates all the possible options. They have to be here to be within scope.
+	   var ColorPDF = new ActiveXObject("pfc.pfcPDFExportInstructions").Create();
+	   var MonoPDF = new ActiveXObject("pfc.pfcPDFExportInstructions").Create();
+	   var SettingsMono = new ActiveXObject("pfc.pfcPDFOptions");
+	   var SettingsColor = new ActiveXObject("pfc.pfcPDFOptions");
+	   var OptionFactory = new ActiveXObject("pfc.pfcPDFOption");
+
+	   //The below creates the setting that stops Pro-E from opening the PDF viewer when it saves a PDF.
+	   var SettingViewerOFF = OptionFactory.Create();
+	   SettingViewerOFF.OptionType = new ActiveXObject("pfc.pfcPDFOptionType").PDFOPT_LAUNCH_VIEWER;
+	   SettingViewerOFF.OptionValue = new ActiveXObject("pfc.MpfcArgument").CreateBoolArgValue(false);   //The documentation mentions the method .setOptionValue, leaving out set made it work for me.
+	   SettingsColor.Append(SettingViewerOFF);
+	   SettingsMono.Append(SettingViewerOFF);
+
+	   //The below creates the setting to make the colors black and white. By default it's color, so I only have to add the Mono seting to the SettingsMono object.
+	   var ColorSetting = OptionFactory.Create();
+	   ColorSetting.OptionType = new ActiveXObject("pfc.pfcPDFOptionType").PDFOPT_COLOR_DEPTH;
+	   ColorSetting.OptionValue = new ActiveXObject("pfc.MpfcArgument").CreateIntArgValue(new ActiveXObject("pfc.pfcPDFColorDepth").PDF_CD_MONO);
+	   SettingsMono.Append(ColorSetting);
+
+	   MonoPDF.Options = SettingsMono;
+	   ColorPDF.Options = SettingsColor;
+
+
+	   var DescriptorFactory = new ActiveXObject("pfc.pfcModelDescriptor");
+
+	   for(var i=0;i<numSelected;i++){
+	       var curDrw = $("#ProEOutput").jqGrid('getRowData', selectedRows[i]);
+	       var targetPN = curDrw.partNumber;
+	       var targetDescript = DescriptorFactory.Create (new ActiveXObject("pfc.pfcModelType").MDL_DRAWING, targetPN , null);
+	       var target = oSession.RetrieveModel(targetDescript);
+	       target.Display();
+	       target.Export(targetPN,ColorPDF);
+	       target.Erase();
+	   }
+       }
    });
 
 });
