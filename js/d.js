@@ -154,8 +154,9 @@ window.oSession = mGlob.GetProESession();  //Returns reference to current sessio
 		target.Display();
 		target.Export(targetPN,ColorPDF);
 //		target.Erase();     //This is commented because it might erase drawings they already have opened and haven't saved.
+		moveFile(oSession.GetCurrentDirectory()+targetPN,curDrw.directory);
 	    }
-	    oSession.CurrentWindow.SetBrowserSize(windowSize);
+	    oSession.CurrentWindow.SetBrowserSize(windowSize);	    
 	}
     });
 
@@ -190,7 +191,8 @@ function dirTarget (partNumber) {
     //This defines the root locations for the parts (FS, Model, or Desktop)
     var targetFS = "\\\\thea\\DavWWWRoot\\Engineering\\PRS\\aero\\Drawings\\";
     var targetModel = "X:\\StockCar\\NASCAR Engineering\\Design\\Design Database\\Scale Model\\Drawings- WTM\\";
-    var targetDesktop = "DesktopDirectory";
+    var wshell = new ActiveXObject("WScript.Shell");
+    var targetDesktop = wshell.SpecialFolders("Desktop");
 
     //This defines the critical character in the filename (zero based, so 0 is the first character).
     var critFSLetter = partNumber.substr(4,1).toUpperCase();
@@ -267,4 +269,10 @@ function dirTarget (partNumber) {
 	return targetDesktop;
     }
 
+}
+
+function moveFile (filename , target){
+    var fso = new ActiveXObject("Scripting.FileSystemObject"); 
+//    alert (filename);
+//    alert (target);
 }
