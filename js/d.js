@@ -143,8 +143,9 @@ window.oSession = mGlob.GetProESession();  //Returns reference to current sessio
 	    ColorPDF.Options = SettingsColor;
 
 	    //This stores the original window size to restore it later.
+	    var windowSize = oSession.CurrentWindow.GetBrowserSize();	    
 	    var DescriptorFactory = new ActiveXObject("pfc.pfcModelDescriptor");
-	    var windowSize = oSession.CurrentWindow.GetBrowserSize();
+	    var fso = new ActiveXObject("Scripting.FileSystemObject"); 
 
 	    for(var i=0;i<numSelected;i++){
 		var curDrw = $("#ProEOutput").jqGrid('getRowData', selectedRows[i]);
@@ -154,7 +155,8 @@ window.oSession = mGlob.GetProESession();  //Returns reference to current sessio
 		target.Display();
 		target.Export(targetPN,ColorPDF);
 //		target.Erase();     //This is commented because it might erase drawings they already have opened and haven't saved.
-		moveFile(oSession.GetCurrentDirectory()+targetPN,curDrw.directory);
+		alert(oSession.GetCurrentDirectory() + targetPN+ ".pdf moved to: " + curDrw.directory + targetPN + ".pdf");
+//		fso.MoveFile(oSession.GetCurrentDirectory() + targetPN+ ".pdf", curDrw.directory + targetPN + ".pdf");
 	    }
 	    oSession.CurrentWindow.SetBrowserSize(windowSize);	    
 	}
@@ -258,21 +260,15 @@ function dirTarget (partNumber) {
     //The first check is for FS parts and ensures the crit character is a letter and the
     if (firstThreeChars==="PRS" && critFSAscii<91 && critFSAscii>64 && partLength<18 && partLength>15) {
 	//THEN PARSE critFSLetter USING A FULL-SCALE PART SPECIFIC METHOD
-	return targetFS + fsDirs[critFSLetter];
+	return targetFS + fsDirs[critFSLetter] + "\\";
     }
     else if (firstThreeChars==="PR1" && critModelAscii<91 && critModelAscii>64 && partLength<14 && partLength>11) {
 	//THEN PARSE critModelLetter USING A MODEL PART SPECIFIC METHOD
-	return targetModel + modelDirs[critModelLetter];
+	return targetModel + modelDirs[critModelLetter] + "\\";
     }
     else {
 	//IT IS NOT PARSABLE AND RETURN "NOT EXPORTING"
-	return targetDesktop;
+	return targetDesktop + "\\";
     }
 
-}
-
-function moveFile (filename , target){
-    var fso = new ActiveXObject("Scripting.FileSystemObject"); 
-//    alert (filename);
-//    alert (target);
 }
