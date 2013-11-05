@@ -38,12 +38,13 @@ $(document).ready(function(){
 	height: 'auto',
 	width: 1250,
 	rowNum: 250,      //This sets the max number of rows possible, if this wasn't here sorting the files shrinks it down to the default 20 vis
-	colNames:['ID','Part Number', 'Description', 'Target Directory'],
+	colNames:['ID','Part Number', 'Description', 'Target Directory', 'Short Directory'],
 	colModel:[
 	    {name:'id',index:'id', width:15, sorttype:"int"},
 	    {name:'partNumber',index:'partNumber', width:120},
 	    {name:'description',index:'description', width:350},
-	    {name:'directory',index:'directory', width:630}
+	    {name:'directory',index:'directory', hidden:true},
+	    {name:'shortDir',index:'shortDir', width:300}
 	],
 	multiselect: true,
 	caption: " "
@@ -94,12 +95,14 @@ window.oSession = mGlob.GetProESession();  //Returns reference to current sessio
        var numDrws = DrwSeq.Count;
        for (var i = 0; i < numDrws; i++) {
 	   var currentDrw = ShortName(DrwSeq.Item(i));
+	   targetDir = dirTarget(currentDrw);
 	   TableData.push(
 	       {
 		   id: i+1,
 		   partNumber: currentDrw,
 		   description: DescFromPart(currentDrw),
-		   directory: dirTarget(currentDrw) 
+		   directory: targetDir,
+		   shortDir: ShortDirName(targetDir) 
 	       }
 	   );
        }
@@ -152,10 +155,10 @@ window.oSession = mGlob.GetProESession();  //Returns reference to current sessio
 		var targetPN = curDrw.partNumber;
 		var targetDescript = DescriptorFactory.Create (new ActiveXObject("pfc.pfcModelType").MDL_DRAWING, targetPN , null);
 		var target = oSession.RetrieveModel(targetDescript);
-		target.Display();
-		target.Export(targetPN,ColorPDF);
+//		target.Display();
+//		target.Export(targetPN,ColorPDF);
 //		target.Erase();     //This is commented because it might erase drawings they already have opened and haven't saved.
-		alert(oSession.GetCurrentDirectory() + targetPN+ ".pdf moved to: " + curDrw.directory + targetPN + ".pdf");
+		console.log(oSession.GetCurrentDirectory() + targetPN+ ".pdf moved to: " + curDrw.directory + targetPN + ".pdf");
 //		fso.MoveFile(oSession.GetCurrentDirectory() + targetPN+ ".pdf", curDrw.directory + targetPN + ".pdf");
 	    }
 	    oSession.CurrentWindow.SetBrowserSize(windowSize);	    
@@ -185,6 +188,12 @@ function DescFromPart (DrawingName) {
 //This function is intended to parse the filename string returned by the ListFile function. Example "wtws://pdm10/Workspace/test_part.drw" would be trimmed to "test_part"
 function ShortName (fullname) {
     return fullname.slice(fullname.lastIndexOf("/")+1,fullname.length-4);
+}
+
+//This function parses the full target directory down to the final folder that everyone knows.
+function ShortDirName (fullDirectory) {
+    var fullDirName =  fullDirectory.substr(0,fullDirectory.length-1);
+    return fullDirName.slice(fullDirName.lastIndexOf("\\")+1,fullDirName.length);
 }
 
 //This function returns the directory the file should be move to, based on it's part number (example: PRS-P-... would be placed in the P-Pedals folder). If it doesn't recognize it as a model part or FS part, it puts it on te desktop.
