@@ -38,19 +38,32 @@ $(document).ready(function(){
 	height: 'auto',
 	width: 1250,
 	rowNum: 250,      //This sets the max number of rows possible, if this wasn't here sorting the files shrinks it down to the default 20 vis
-	colNames:['ID','Part Number', 'Description', 'Target Directory', 'Short Directory'],
+	colNames:['ID','Part Number', 'Description', 'Target Directory', 'Original Directory'],
 	colModel:[
 	    {name:'id',index:'id', width:15, sorttype:"int"},
 	    {name:'partNumber',index:'partNumber', width:120},
 	    {name:'description',index:'description', width:350},
-	    {name:'directory',index:'directory', hidden:true},
-	    {name:'shortDir',index:'shortDir', width:300}
+	    {name:'directory',index:'directory', width:200, formatter: function(cellValue) {return ShortDirName(cellValue)}},
+	    {name:'origDir',index:'origDir', hidden:true}
 	],
 	multiselect: true,
-	caption: " "
+	caption: " ",
+	hiddengrid:true,
+	onCellSelect: function(rowId,iCol,cellContent){
+	    if(iCol === 4){
+		var origDirectory = $(this).getCell(rowId,5);
+		var shortOrigDirectory = ShortDirName(origDirectory);
+		if(cellContent === shortOrigDirectory){
+		    $(this).setCell(rowId,iCol,dirTarget("Desktop"));
+		}
+		else{
+		    $(this).setCell(rowId,iCol,origDirectory);
+		}
+	    }
+
+	}
     });
 
-    $("#ProEOutput").jqGrid('setGridState','hidden');
     $("#ProEOutput").parents('div.ui-jqgrid-bdiv').css("max-height","540px");
 
 //INITIALIZE CONNECTION TO PRO-E (The window. is javascript syntax to make mGlob and oSession global for use in the DescFromPart function since it's a function decleration its intepreted before this line is ran, so oSession would otherwise be out of scope of DescFromPart.
@@ -102,7 +115,7 @@ window.oSession = mGlob.GetProESession();  //Returns reference to current sessio
 		   partNumber: currentDrw,
 		   description: DescFromPart(currentDrw),
 		   directory: targetDir,
-		   shortDir: ShortDirName(targetDir) 
+		   origDir: targetDir,
 	       }
 	   );
        }
