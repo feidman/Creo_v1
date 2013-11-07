@@ -55,11 +55,12 @@ $(document).ready(function(){
 	    if(iCol === 4){
 		var origDirectory = $(this).getCell(rowId,5);
 		var shortOrigDirectory = ShortDirName(origDirectory);
+		alert("Orig: " + origDirectory + "\nShortOrig: " + shortOrigDirectory + "\ncellContent: " + cellContent);
 		if(cellContent === shortOrigDirectory){
-		    $(this).setCell(rowId,iCol,dirTarget("Desktop"));
+		    $(this).setCell(rowId,iCol,dirTarget('Desktop'),{'font-weight':'bold'});
 		}
 		else{
-		    $(this).setCell(rowId,iCol,origDirectory);
+		    $(this).setCell(rowId,iCol,origDirectory,{'font-weight':'normal'});
 		}
 	    }
 
