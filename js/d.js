@@ -37,6 +37,7 @@ $(document).ready(function(){
 	datatype: "local",
 	height: 'auto',
 	width: 1250,
+	forceFit: true,
 	rowNum: 250,      //This sets the max number of rows possible, if this wasn't here sorting the files shrinks it down to the default 20 vis
 	colNames:['ID','Part Number', 'Description', 'Target Directory', 'Original Directory'],
 	colModel:[
