@@ -36,15 +36,15 @@ $(document).ready(function(){
     $("#ProEOutput").jqGrid({
 	datatype: "local",
 	height: 'auto',
-	width: 1250,
+	width: $(window).width()-$('#howto_button').width()-25,
 	forceFit: true,
 	rowNum: 250,      //This sets the max number of rows possible, if this wasn't here sorting the files shrinks it down to the default 20 vis
 	colNames:['ID','Part Number', 'Description', 'Target Directory', 'Original Directory'],
 	colModel:[
 	    {name:'id',index:'id', width:15, sorttype:"int"},
-	    {name:'partNumber',index:'partNumber', width:120},
-	    {name:'description',index:'description', width:350},
-	    {name:'directory',index:'directory', width:200, formatter: function(cellValue) {return ShortDirName(cellValue)}},
+	    {name:'partNumber',index:'partNumber', width:50},
+	    {name:'description',index:'description'},
+	    {name:'directory',index:'directory', width:50, formatter: function(cellValue) {return ShortDirName(cellValue)}},
 	    {name:'origDir',index:'origDir', hidden:true}
 	],
 	multiselect: true,
