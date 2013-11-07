@@ -49,6 +49,7 @@ $(document).ready(function(){
 	multiselect: true,
 	caption: " ",
 	hiddengrid:true,
+	deselectAfterSort:false,
 	onCellSelect: function(rowId,iCol,cellContent){
 	    if(iCol === 4){
 		var origDirectory = $(this).getCell(rowId,5);
