@@ -39,28 +39,36 @@ $(document).ready(function(){
 	width: $(window).width()-$('#howto_button').width()-25,
 	forceFit: true,
 	rowNum: 250,      //This sets the max number of rows possible, if this wasn't here sorting the files shrinks it down to the default 20 vis
-	colNames:['ID','Part Number', 'Description', 'Target Directory', 'Original Directory'],
+	colNames:['ID','Part Number', 'Description', 'Target Directory', 'Original Directory','Short Directory'],
 	colModel:[
 	    {name:'id',index:'id', width:15, sorttype:"int"},
 	    {name:'partNumber',index:'partNumber', width:50},
 	    {name:'description',index:'description'},
-	    {name:'directory',index:'directory', width:50, formatter: function(cellValue) {return ShortDirName(cellValue)}},
-	    {name:'origDir',index:'origDir', hidden:true}
+	    {name:'directory',index:'directory'},
+	    {name:'origDir',index:'origDir'},
+	    {name:'shortDir',index:'shortDir', width:50}
 	],
 	multiselect: true,
 	caption: " ",
 	hiddengrid:true,
 	deselectAfterSort:false,
 	onCellSelect: function(rowId,iCol,cellContent){
-	    if(iCol === 4){
+	    /*This part is probably really slow, but it makes it so that the order of the columns doesn't matter. iCol returns a number.
+	     The below returns instead triggers the logic if the correct column name is triggered.*/
+	    var cm = $(this).jqGrid("getGridParam", "colModel");
+	    var colName = cm[iCol].name;
+
+	    if(colName === 'shortDir'){
 		var origDirectory = $(this).getCell(rowId,5);
 		var shortOrigDirectory = ShortDirName(origDirectory);
-		alert("Orig: " + origDirectory + "\nShortOrig: " + shortOrigDirectory + "\ncellContent: " + cellContent);
+//		alert("Orig: " + origDirectory + "\nShortOrig: " + shortOrigDirectory + "\ncellContent: " + cellContent);
 		if(cellContent === shortOrigDirectory){
-		    $(this).setCell(rowId,iCol,dirTarget('Desktop'),{'font-weight':'bold'});
+		    $(this).setCell(rowId,'directory',dirTarget('Desktop'));
+		    $(this).setCell(rowId,iCol,ShortDirName(dirTarget('Desktop')),{'font-weight':'bold'});
 		}
 		else{
-		    $(this).setCell(rowId,iCol,origDirectory,{'font-weight':'normal'});
+		    $(this).setCell(rowId,'directory',origDirectory);
+		    $(this).setCell(rowId,iCol,shortOrigDirectory,{'font-weight':'normal'});
 		}
 	    }
 
@@ -119,6 +127,7 @@ window.oSession = mGlob.GetProESession();  //Returns reference to current sessio
 		   description: DescFromPart(currentDrw),
 		   directory: targetDir,
 		   origDir: targetDir,
+		   shortDir: ShortDirName(targetDir)
 	       }
 	   );
        }
