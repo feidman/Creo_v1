@@ -44,8 +44,8 @@ $(document).ready(function(){
 	    {name:'id',index:'id', width:15, sorttype:"int"},
 	    {name:'partNumber',index:'partNumber', width:50},
 	    {name:'description',index:'description'},
-	    {name:'directory',index:'directory'},
-	    {name:'origDir',index:'origDir'},
+	    {name:'directory',index:'directory', hidden:true},
+	    {name:'origDir',index:'origDir', hidden:true},
 	    {name:'shortDir',index:'shortDir', width:50}
 	],
 	multiselect: true,
@@ -60,7 +60,7 @@ $(document).ready(function(){
 
 	    if(colName === 'shortDir'){
 		$grid=$(this);
-		var origDirectory = $grid.getCell(rowId,5);
+		var origDirectory = $grid.getCell(rowId,'origDir');
 		var shortOrigDirectory = ShortDirName(origDirectory);
 		if(cellContent === shortOrigDirectory){
 		    $grid.setCell(rowId,'directory',dirTarget('Desktop'));
