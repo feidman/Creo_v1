@@ -59,16 +59,16 @@ $(document).ready(function(){
 	    var colName = cm[iCol].name;
 
 	    if(colName === 'shortDir'){
-		var origDirectory = $(this).getCell(rowId,5);
+		$grid=$(this);
+		var origDirectory = $grid.getCell(rowId,5);
 		var shortOrigDirectory = ShortDirName(origDirectory);
-//		alert("Orig: " + origDirectory + "\nShortOrig: " + shortOrigDirectory + "\ncellContent: " + cellContent);
 		if(cellContent === shortOrigDirectory){
-		    $(this).setCell(rowId,'directory',dirTarget('Desktop'));
-		    $(this).setCell(rowId,iCol,ShortDirName(dirTarget('Desktop')),{'font-weight':'bold'});
+		    $grid.setCell(rowId,'directory',dirTarget('Desktop'));
+		    $grid.setCell(rowId,iCol,ShortDirName(dirTarget('Desktop')),{'font-weight':'bold'});
 		}
 		else{
-		    $(this).setCell(rowId,'directory',origDirectory);
-		    $(this).setCell(rowId,iCol,shortOrigDirectory,{'font-weight':'normal'});
+		    $grid.setCell(rowId,'directory',origDirectory);
+		    $grid.setCell(rowId,iCol,shortOrigDirectory,{'font-weight':'normal'});
 		}
 	    }
 
