@@ -39,9 +39,10 @@ $(document).ready(function(){
 	width: $(window).width()-$('#howto_button').width()-25,
 	forceFit: true,
 	rowNum: 250,      //This sets the max number of rows possible, if this wasn't here sorting the files shrinks it down to the default 20 vis
-	colNames:['ID','Part Number', 'Description', 'Target Directory', 'Original Directory','Short Directory'],
+	colNames:['ID','','Part Number', 'Description', 'Target Directory', 'Original Directory','Short Directory'],
 	colModel:[
 	    {name:'id',index:'id', width:15, sorttype:"int"},
+	    {name:'fileExists',index:'fileExists', width:15},
 	    {name:'partNumber',index:'partNumber', width:50},
 	    {name:'description',index:'description'},
 	    {name:'directory',index:'directory', hidden:true},
@@ -80,7 +81,7 @@ $(document).ready(function(){
 //INITIALIZE CONNECTION TO PRO-E (The window. is javascript syntax to make mGlob and oSession global for use in the DescFromPart function since it's a function decleration its intepreted before this line is ran, so oSession would otherwise be out of scope of DescFromPart.
 window.mGlob = new ActiveXObject("pfc.MpfcCOMGlobal"); //Makes connection to Pro-E
 window.oSession = mGlob.GetProESession();  //Returns reference to current session to oSession
-
+window.fso = new ActiveXObject("Scripting.FileSystemObject"); //This needed to be global so I could populate the FileExists Column in one function and move/delete files in another function.
 //MAIN PROGRAM
 
 //OPENS THE DRW OF THE CURRENTLY OPENED PRT.
@@ -120,9 +121,11 @@ window.oSession = mGlob.GetProESession();  //Returns reference to current sessio
        for (var i = 0; i < numDrws; i++) {
 	   var currentDrw = ShortName(DrwSeq.Item(i));
 	   targetDir = dirTarget(currentDrw);
+	   alert(targetDir + currentDrw + ".pdf");
 	   TableData.push(
 	       {
 		   id: i+1,
+		   fileExists: fso.FileExists(targetDir + currentDrw + ".pdf"),
 		   partNumber: currentDrw,
 		   description: DescFromPart(currentDrw),
 		   directory: targetDir,
@@ -173,18 +176,22 @@ window.oSession = mGlob.GetProESession();  //Returns reference to current sessio
 	    //This stores the original window size to restore it later.
 	    var windowSize = oSession.CurrentWindow.GetBrowserSize();	    
 	    var DescriptorFactory = new ActiveXObject("pfc.pfcModelDescriptor");
-	    var fso = new ActiveXObject("Scripting.FileSystemObject"); 
 
 	    for(var i=0;i<numSelected;i++){
 		var curDrw = $("#ProEOutput").jqGrid('getRowData', selectedRows[i]);
 		var targetPN = curDrw.partNumber;
 		var targetDescript = DescriptorFactory.Create (new ActiveXObject("pfc.pfcModelType").MDL_DRAWING, targetPN , null);
 		var target = oSession.RetrieveModel(targetDescript);
-//		target.Display();
-//		target.Export(targetPN,ColorPDF);
-//		target.Erase();     //This is commented because it might erase drawings they already have opened and haven't saved.
-		console.log(oSession.GetCurrentDirectory() + targetPN+ ".pdf moved to: " + curDrw.directory + targetPN + ".pdf");
-//		fso.MoveFile(oSession.GetCurrentDirectory() + targetPN+ ".pdf", curDrw.directory + targetPN + ".pdf");
+		target.Display();
+		target.Export(targetPN,ColorPDF);
+		target.Erase();     //This is commented because it might erase drawings they already have opened and haven't saved.
+		var fullNetworkFile = curDrw.directory + targetPN + ".pdf";
+		var fullNewFile = oSession.GetCurrentDirectory() + targetPN+ ".pdf";
+		alert(fullNetworkFile + " moved to: " + fullNewFile);
+
+		if (replaceLogic && fileExists){
+		    fso.MoveFile(oSession.GetCurrentDirectory() + targetPN+ ".pdf", curDrw.directory + targetPN + ".pdf");
+		}
 	    }
 	    oSession.CurrentWindow.SetBrowserSize(windowSize);	    
 	}
