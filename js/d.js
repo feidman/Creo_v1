@@ -47,12 +47,22 @@ $(document).ready(function(){
 		 //The below correctly shows the jquery icon, but it also shows all the jqeuery icons after it too! No good.
 //		 if (cValue === "true") {return '<span class="ui-icon ui-icon-refresh"></span>'; }
 //		 if (cValue === "false") {return '<span class="ui-icon ui-icon-check" title="New Drawing"></span>'; }
-	    }},
+	     }
+	    },
 	    {name:'partNumber',index:'partNumber', width:50},
 	    {name:'description',index:'description'},
 	    {name:'directory',index:'directory', hidden:true},
 	    {name:'origDir',index:'origDir', hidden:true},
-	    {name:'shortDir',index:'shortDir', width:50}
+	    {name:'shortDir',index:'shortDir', width:50,
+	    	     cellattr: function(rowId, cValue, rawObject, cm, rdata) {
+			 if (rawObject.origDir !== dirTarget('Desktop')){
+//			     return 'title= "' + rawObject.origDir + " and " + rawObject.directory +'"';
+//			     return 'style = "font-weight:bold"';
+			     if (rawObject.directory !== rawObject.origDir) {return 'style = "font-weight:bold"';}
+			     else {return 'style = "font-weight:normal"';}
+			 }
+		     }
+	    }
 	],
 	multiselect: true,
 	caption: " ",
@@ -70,11 +80,11 @@ $(document).ready(function(){
 		var shortOrigDirectory = ShortDirName(origDirectory);
 		if(cellContent === shortOrigDirectory){
 		    $grid.setCell(rowId,'directory',dirTarget('Desktop'));
-		    $grid.setCell(rowId,iCol,ShortDirName(dirTarget('Desktop')),{'font-weight':'bold'});
+		    $grid.setCell(rowId,iCol,ShortDirName(dirTarget('Desktop')));
 		}
 		else{
 		    $grid.setCell(rowId,'directory',origDirectory);
-		    $grid.setCell(rowId,iCol,shortOrigDirectory,{'font-weight':'normal'});
+		    $grid.setCell(rowId,iCol,shortOrigDirectory);
 		}
 	    }
 	}
