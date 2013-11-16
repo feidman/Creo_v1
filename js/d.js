@@ -302,7 +302,10 @@ function dirTarget (partNumber) {
     };
 
     //The first check is for FS parts and ensures the crit character is a letter and the
-    if (firstThreeChars==="PRS" && critFSAscii<91 && critFSAscii>64 && partLength<18 && partLength>15) {
+    if (partNumber === 'Desktop'){
+	return targetDesktop + "\\";
+    }
+    else if (firstThreeChars==="PRS" && critFSAscii<91 && critFSAscii>64 && partLength<18 && partLength>15) {
 	//THEN PARSE critFSLetter USING A FULL-SCALE PART SPECIFIC METHOD
 	return targetFS + fsDirs[critFSLetter] + "\\";
     }
