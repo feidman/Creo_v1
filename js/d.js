@@ -39,10 +39,15 @@ $(document).ready(function(){
 	width: $(window).width()-$('#howto_button').width()-25,
 	forceFit: true,
 	rowNum: 250,      //This sets the max number of rows possible, if this wasn't here sorting the files shrinks it down to the default 20 vis
-	colNames:['ID','','Part Number', 'Description', 'Target Directory', 'Original Directory','Short Directory'],
+	colNames:['ID','File Exists','Part Number', 'Description', 'Target Directory', 'Original Directory','Short Directory'],
 	colModel:[
 	    {name:'id',index:'id', width:15, sorttype:"int"},
-	    {name:'fileExists',index:'fileExists', width:15},
+	    {name:'fileExists',index:'fileExists', width:5,
+	     cellattr: function(rowId, cValue, rawObject, cm, rdata) {
+		 //The below correctly shows the jquery icon, but it also shows all the jqeuery icons after it too! No good.
+//		 if (cValue === "true") {return '<span class="ui-icon ui-icon-refresh"></span>'; }
+//		 if (cValue === "false") {return '<span class="ui-icon ui-icon-check" title="New Drawing"></span>'; }
+	    }},
 	    {name:'partNumber',index:'partNumber', width:50},
 	    {name:'description',index:'description'},
 	    {name:'directory',index:'directory', hidden:true},
@@ -72,7 +77,6 @@ $(document).ready(function(){
 		    $grid.setCell(rowId,iCol,shortOrigDirectory,{'font-weight':'normal'});
 		}
 	    }
-
 	}
     });
 
@@ -121,7 +125,6 @@ window.fso = new ActiveXObject("Scripting.FileSystemObject"); //This needed to b
        for (var i = 0; i < numDrws; i++) {
 	   var currentDrw = ShortName(DrwSeq.Item(i));
 	   targetDir = dirTarget(currentDrw);
-	   alert(targetDir + currentDrw + ".pdf");
 	   TableData.push(
 	       {
 		   id: i+1,
