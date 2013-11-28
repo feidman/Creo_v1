@@ -68,14 +68,6 @@ $(document).ready(function(){
 	caption: " ",
 	hiddengrid:true,
 	deselectAfterSort:false,
-/*	beforeSelectRow: function(rowid,e){
-	    if(e.target.type == 'checkbox'){   //An example, see bookmarks, showed using e.target get info, but that returns an object, I guessed that .type would get me something. It returns undefined for everything else.
-		return true;
-	    }
-	    else{
-		return false;
-	    }
-	},   */
 	onCellSelect: function(rowId,iCol,cellContent){
 	    /*This part is probably really slow, but it makes it so that the order of the columns doesn't matter. iCol returns a number.
 	     The below returns instead triggers the logic if the correct column name is triggered.*/
@@ -102,6 +94,9 @@ $(document).ready(function(){
 		else if(cellContent == "Overwrite" || cellContent == "Released"){
 		    $grid.setCell(rowId,iCol,'Exists');
 		}
+	    }
+	    if(iCol !== 0){  //This part makes it so that only the first column, the checkboxes is able to select columns.I could have used colName !== 'cb', because cb is apparently the name of the checkbox column.
+		$grid.setSelection(rowId,false);
 	    }
 	}
     });
