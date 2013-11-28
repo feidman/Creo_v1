@@ -42,7 +42,7 @@ $(document).ready(function(){
 	colNames:['ID','File Exists','Part Number', 'Description', 'Target Directory', 'Original Directory','Short Directory'],
 	colModel:[
 	    {name:'id',index:'id', width:15, sorttype:"int", title: false},
-	    {name:'fileExists',index:'fileExists', width:5, title: false,
+	    {name:'fileExists',index:'fileExists', width:15, title: false,
 	     cellattr: function(rowId, cValue, rawObject, cm, rdata) {
 		 //The below correctly shows the jquery icon, but it also shows all the jqeuery icons after it too! No good.
 //		 if (cValue === "true") {return '<span class="ui-icon ui-icon-refresh"></span>'; }
@@ -68,6 +68,14 @@ $(document).ready(function(){
 	caption: " ",
 	hiddengrid:true,
 	deselectAfterSort:false,
+	beforeSelectRow: function(rowid,e){
+	    if(e.target.type == 'checkbox'){   //An example, see bookmarks, showed using e.target get info, but that returns an object, I guessed that .type would get me something. It returns undefined for everything else.
+		return true;
+	    }
+	    else{
+		return false;
+	    }
+	},
 	onCellSelect: function(rowId,iCol,cellContent){
 	    /*This part is probably really slow, but it makes it so that the order of the columns doesn't matter. iCol returns a number.
 	     The below returns instead triggers the logic if the correct column name is triggered.*/
@@ -75,7 +83,7 @@ $(document).ready(function(){
 	    var colName = cm[iCol].name;
 
 	    if(colName === 'shortDir'){
-		$grid=$(this);
+		var $grid=$(this);
 		var origDirectory = $grid.getCell(rowId,'origDir');
 		var shortOrigDirectory = ShortDirName(origDirectory);
 		if(cellContent === shortOrigDirectory){
@@ -85,6 +93,15 @@ $(document).ready(function(){
 		else{
 		    $grid.setCell(rowId,'directory',origDirectory);
 		    $grid.setCell(rowId,iCol,shortOrigDirectory);
+		}
+	    }
+	    if(colName === 'fileExists'){
+		var $grid=$(this);
+		if(cellContent === 'Exists'){
+		    $grid.setCell(rowId,iCol,'Overwrite');
+		}
+		else if(cellContent == "Overwrite" || cellContent == "Released"){
+		    $grid.setCell(rowId,iCol,'Exists');
 		}
 	    }
 	}
@@ -138,7 +155,7 @@ window.fso = new ActiveXObject("Scripting.FileSystemObject"); //This needed to b
 	   TableData.push(
 	       {
 		   id: i+1,
-		   fileExists: fso.FileExists(targetDir + currentDrw + ".pdf"),
+		   fileExists: fso.FileExists(targetDir + currentDrw + ".pdf") ? "Exists" : "New",
 		   partNumber: currentDrw,
 		   description: DescFromPart(currentDrw),
 		   directory: targetDir,
@@ -157,7 +174,7 @@ window.fso = new ActiveXObject("Scripting.FileSystemObject"); //This needed to b
     });
 
     $('#pdfApprove').click(function(){
-	var selectedRows = jQuery("#ProEOutput").jqGrid('getGridParam','selarrrow');
+	var selectedRows = $("#ProEOutput").jqGrid('getGridParam','selarrrow');
 	var numSelected = selectedRows.length;
 
 	//Only creates this stuff if anything was selected AKA selection count is greater than 0.
@@ -191,19 +208,31 @@ window.fso = new ActiveXObject("Scripting.FileSystemObject"); //This needed to b
 	    var DescriptorFactory = new ActiveXObject("pfc.pfcModelDescriptor");
 
 	    for(var i=0;i<numSelected;i++){
-		var curDrw = $("#ProEOutput").jqGrid('getRowData', selectedRows[i]);
+		var $grid =  $("#ProEOutput");
+		var actualRowNum = selectedRows[i];
+		var curDrw = $grid.jqGrid('getRowData', actualRowNum);
 		var targetPN = curDrw.partNumber;
+		var targetOverwrite = curDrw.fileExists;
+		var fullNetworkFile = curDrw.directory + targetPN + ".pdf";
+		var fullNewFile = oSession.GetCurrentDirectory() + targetPN+ ".pdf";
+		
 		var targetDescript = DescriptorFactory.Create (new ActiveXObject("pfc.pfcModelType").MDL_DRAWING, targetPN , null);
 		var target = oSession.RetrieveModel(targetDescript);
 		target.Display();
 		target.Export(targetPN,ColorPDF);
 		target.Erase();     //This is commented because it might erase drawings they already have opened and haven't saved.
-		var fullNetworkFile = curDrw.directory + targetPN + ".pdf";
-		var fullNewFile = oSession.GetCurrentDirectory() + targetPN+ ".pdf";
-		alert(fullNetworkFile + " moved to: " + fullNewFile);
 
-		if (replaceLogic && fileExists){
-		    fso.MoveFile(oSession.GetCurrentDirectory() + targetPN+ ".pdf", curDrw.directory + targetPN + ".pdf");
+		if (targetOverwrite === "New"){
+		    fso.MoveFile(fullNewFile, fullNetworkFile);
+		    $grid.setCell(actualRowNum,'fileExists','Released');
+		}
+		else if (targetOverwrite === "Overwrite"){
+		    fso.deleteFile(fullNetworkFile);
+		    fso.MoveFile(fullNewFile, fullNetworkFile);
+		    $grid.setCell(actualRowNum,'fileExists','Released');
+		}
+		else if (targetOverwrite === "Exists" || targetOverwrite === "Released"){
+		    fso.deleteFile(fullNewFile);    //deletes the exported file instead of moving it.
 		}
 	    }
 	    oSession.CurrentWindow.SetBrowserSize(windowSize);	    
