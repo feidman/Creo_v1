@@ -68,22 +68,22 @@ $(document).ready(function(){
 	caption: " ",
 	hiddengrid:true,
 	deselectAfterSort:false,
-	beforeSelectRow: function(rowid,e){
+/*	beforeSelectRow: function(rowid,e){
 	    if(e.target.type == 'checkbox'){   //An example, see bookmarks, showed using e.target get info, but that returns an object, I guessed that .type would get me something. It returns undefined for everything else.
 		return true;
 	    }
 	    else{
 		return false;
 	    }
-	},
+	},   */
 	onCellSelect: function(rowId,iCol,cellContent){
 	    /*This part is probably really slow, but it makes it so that the order of the columns doesn't matter. iCol returns a number.
 	     The below returns instead triggers the logic if the correct column name is triggered.*/
-	    var cm = $(this).jqGrid("getGridParam", "colModel");
+	    var $grid=$(this);    
+	    var cm = $grid.jqGrid("getGridParam", "colModel");
 	    var colName = cm[iCol].name;
 
 	    if(colName === 'shortDir'){
-		var $grid=$(this);
 		var origDirectory = $grid.getCell(rowId,'origDir');
 		var shortOrigDirectory = ShortDirName(origDirectory);
 		if(cellContent === shortOrigDirectory){
@@ -96,7 +96,6 @@ $(document).ready(function(){
 		}
 	    }
 	    if(colName === 'fileExists'){
-		var $grid=$(this);
 		if(cellContent === 'Exists'){
 		    $grid.setCell(rowId,iCol,'Overwrite');
 		}
