@@ -39,10 +39,10 @@ $(document).ready(function(){
 	width: $(window).width()-$('#howto_button').width()-25,
 	forceFit: true,
 	rowNum: 250,      //This sets the max number of rows possible, if this wasn't here sorting the files shrinks it down to the default 20 vis
-	colNames:['ID','File Exists','Part Number', 'Description', 'Target Directory', 'Original Directory','Short Directory'],
+	colNames:['ID','Status','Part Number', 'Description', 'Target Directory', 'Original Directory','Short Directory'],
 	colModel:[
-	    {name:'id',index:'id', width:15, sorttype:"int", title: false},
-	    {name:'fileExists',index:'fileExists', width:15, title: false,
+	    {name:'id',index:'id', width:15, sorttype:"int", title: false, hidden:true},
+	    {name:'fileExists',index:'fileExists', width:15, sortable: false,title: false,
 	     cellattr: function(rowId, cValue, rawObject, cm, rdata) {
 		 //The below correctly shows the jquery icon, but it also shows all the jqeuery icons after it too! No good.
 //		 if (cValue === "true") {return '<span class="ui-icon ui-icon-refresh"></span>'; }
