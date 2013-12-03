@@ -207,26 +207,18 @@ window.fso = new ActiveXObject("Scripting.FileSystemObject"); //This needed to b
 		var curDrw = $grid.jqGrid('getRowData', actualRowNum);
 		var targetPN = curDrw.partNumber;
 		var targetOverwrite = curDrw.fileExists;
-		var fullNetworkFile = curDrw.directory + "PDF FILES\\" +targetPN + ".pdf";
+		var fullNetworkFile = curDrw.directory + targetPN + ".pdf";
 		var fullNewFile = oSession.GetCurrentDirectory() + targetPN+ ".pdf";
 		
-		var targetDescript = DescriptorFactory.Create (new ActiveXObject("pfc.pfcModelType").MDL_DRAWING, targetPN , null);
-		var target = oSession.RetrieveModel(targetDescript);
-		target.Display();
-		target.Export(targetPN,ColorPDF);
-		target.Erase();     //This is commented because it might erase drawings they already have opened and haven't saved.
-
-		if (targetOverwrite === "New"){
+		if (targetOverwrite === "New" | targetOverwrite === "Overwrite"){
+		    var targetDescript = DescriptorFactory.Create (new ActiveXObject("pfc.pfcModelType").MDL_DRAWING, targetPN , null);
+		    var target = oSession.RetrieveModel(targetDescript);
+		    target.Display();
+		    target.Export(targetPN,ColorPDF);
+//		    target.Erase();     //This is commented because it might erase drawings they already have opened and haven't saved.
+		    if (targetOverwrite === "Overwrite"){fso.deleteFile(fullNetworkFile);}
 		    fso.MoveFile(fullNewFile, fullNetworkFile);
 		    $grid.setCell(actualRowNum,'fileExists','Released');
-		}
-		else if (targetOverwrite === "Overwrite"){
-		    fso.deleteFile(fullNetworkFile);
-		    fso.MoveFile(fullNewFile, fullNetworkFile);
-		    $grid.setCell(actualRowNum,'fileExists','Released');
-		}
-		else if (targetOverwrite === "Exists" || targetOverwrite === "Released"){
-		    fso.deleteFile(fullNewFile);    //deletes the exported file instead of moving it.
 		}
 	    }
 	    oSession.CurrentWindow.SetBrowserSize(windowSize);	    
@@ -340,14 +332,14 @@ function dirTarget (partNumber) {
     }
     else if (firstThreeChars==="PRS" && critFSAscii<91 && critFSAscii>64 && partLength<18 && partLength>15) {
 	//THEN PARSE critFSLetter USING A FULL-SCALE PART SPECIFIC METHOD
-	return targetFS + fsDirs[critFSLetter] + "\\";
+	return targetFS + fsDirs[critFSLetter] + "\\PDF FILES\\";
     }
     else if (firstThreeChars==="PR1" && critModelAscii<91 && critModelAscii>64 && partLength<14 && partLength>11) {
 	//THEN PARSE critModelLetter USING A MODEL PART SPECIFIC METHOD
-	return targetModel + modelDirs[critModelLetter] + "\\";
+	return targetModel + modelDirs[critModelLetter] + "\\PDF FILES\\";
     }
     else {
-	//IT IS NOT PARSABLE AND RETURN "NOT EXPORTING"
+	//IF IT IS NOT PARSABLE AND RETURN "NOT EXPORTING"
 	return targetDesktop + "\\";
     }
 
