@@ -207,7 +207,7 @@ window.fso = new ActiveXObject("Scripting.FileSystemObject"); //This needed to b
 		var curDrw = $grid.jqGrid('getRowData', actualRowNum);
 		var targetPN = curDrw.partNumber;
 		var targetOverwrite = curDrw.fileExists;
-		var fullNetworkFile = curDrw.directory + targetPN + ".pdf";
+		var fullNetworkFile = curDrw.directory + "PDF FILES\\" +targetPN + ".pdf";
 		var fullNewFile = oSession.GetCurrentDirectory() + targetPN+ ".pdf";
 		
 		var targetDescript = DescriptorFactory.Create (new ActiveXObject("pfc.pfcModelType").MDL_DRAWING, targetPN , null);
