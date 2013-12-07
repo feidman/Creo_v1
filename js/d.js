@@ -39,7 +39,7 @@ $(document).ready(function(){
 	width: $(window).width()-$('#howto_button').width()-25,
 	forceFit: true,
 	rowNum: 250,      //This sets the max number of rows possible, if this wasn't here sorting the files shrinks it down to the default 20 vis
-	colNames:['ID','Status','Part Number', 'Description', 'Target Directory', 'Original Directory','Short Directory'],
+	colNames:['ID','Status','Part Number', 'Description', 'Actual Target Directory', 'Original Directory','Target Directory'],
 	colModel:[
 	    {name:'id',index:'id', width:15, sorttype:"int", title: false, hidden:true},
 	    {name:'fileExists',index:'fileExists', width:15, sortable: false,title: false,
@@ -78,20 +78,26 @@ $(document).ready(function(){
 	    if(colName === 'shortDir'){
 		var origDirectory = $grid.getCell(rowId,'origDir');
 		var shortOrigDirectory = ShortDirName(origDirectory);
-		if(cellContent === shortOrigDirectory){
-		    $grid.setCell(rowId,'directory',dirTarget('Desktop'));
-		    $grid.setCell(rowId,iCol,ShortDirName(dirTarget('Desktop')));
-		}
-		else{
+		if (cellContent === shortOrigDirectory) {
+		    var desktopDir = dirTarget('Desktop');
+		    $grid.setCell(rowId,'directory',desktopDir);
+		    $grid.setCell(rowId,iCol,ShortDirName(desktopDir));
+		} else {
 		    $grid.setCell(rowId,'directory',origDirectory);
 		    $grid.setCell(rowId,iCol,shortOrigDirectory);
 		}
+		
+ 		if (fso.FileExists(desktopDir + $grid.getCell(rowId,'partNumber') + ".pdf")) {
+		    $grid.setCell(rowId,'fileExists','Exists');
+		} else {
+		    $grid.setCell(rowId,'fileExists','New');
+		}		
 	    }
 	    if(colName === 'fileExists'){
 		if(cellContent === 'Exists'){
 		    $grid.setCell(rowId,iCol,'Overwrite');
 		}
-		else if(cellContent == "Overwrite" || cellContent == "Released"){
+		else if(cellContent === "Overwrite" || cellContent === "Released"){
 		    $grid.setCell(rowId,iCol,'Exists');
 		}
 	    }
@@ -252,8 +258,13 @@ function ShortName (fullname) {
 
 //This function parses the full target directory down to the final folder that everyone knows.
 function ShortDirName (fullDirectory) {
-    var fullDirName =  fullDirectory.substr(0,fullDirectory.length-1);
-    return fullDirName.slice(fullDirName.lastIndexOf("\\")+1,fullDirName.length);
+    var fullDirName =  fullDirectory.substring(0,fullDirectory.length-1);
+    var critNetwork = fullDirectory.indexOf('\\PDF FILES');
+    if (critNetwork !== -1){
+	fullDirName = fullDirName.substring(0,critNetwork);
+    }
+
+    return fullDirName.slice(fullDirName.lastIndexOf('\\')+1,fullDirName.length);
 }
 
 //This function returns the directory the file should be move to, based on it's part number (example: PRS-P-... would be placed in the P-Pedals folder). If it doesn't recognize it as a model part or FS part, it puts it on te desktop.
