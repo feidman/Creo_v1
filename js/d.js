@@ -222,7 +222,7 @@ window.fso = new ActiveXObject("Scripting.FileSystemObject"); //This needed to b
 		    target.Display();
 		    target.Export(targetPN,ColorPDF);
 //		    target.Erase();     //This is commented because it might erase drawings they already have opened and haven't saved.
-		   es if (targetOverwrite === "Overwrite"){fso.deleteFile(fullNetworkFile);}
+		    if (targetOverwrite === "Overwrite"){fso.deleteFile(fullNetworkFile);}
 		    fso.MoveFile(fullNewFile, fullNetworkFile);
 		    $grid.setCell(actualRowNum,'fileExists','Released');
 		}
