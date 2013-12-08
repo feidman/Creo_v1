@@ -79,6 +79,14 @@ padding-right:15px;
     border-radius:5px;
 }
 
+li:hover,#howto_button:hover,#pdfApprove:hover{
+color:gold;
+}
+
+li,#howto_button,#pdfApprove{
+cursor:pointer;
+}
+
 html{
    /*This section adds the centered and scaling background image*/
    background: url("../pic/burnout_hires.jpg") no-repeat center center fixed; 

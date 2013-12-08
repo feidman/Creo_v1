@@ -1,6 +1,6 @@
 $(document).ready(function(){
     //Fades in menus
-    $('div').hide().fadeIn(1000);
+    $('div').hide().fadeIn(2000);
     $('#howto').hide();
     $('#pdfApprove').hide();
 
@@ -9,19 +9,6 @@ $(document).ready(function(){
 	if($('#howto_button').text() === "How-To")
 	{$('#howto_button').fadeOut('fast');}
     }, 10000);
-
-    //Toggles the appearance of the list items - hover(on action, off action)
-    $('li').hover(
-	function(){
-	    $(this).css('color', 'gold');
-	},
-	function(){
-	    $(this).css('color', '');
-	}
-    );
-
-    $('#howto_button').css('cursor','pointer');
-    $('li').css('cursor','pointer');
 
     $('#howto_button').click(function(){
 	if($('#howto_button').text() != "Hide"){
