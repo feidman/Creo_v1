@@ -71,38 +71,40 @@ $(document).ready(function(){
 	onCellSelect: function(rowId,iCol,cellContent){
 	    /*This part is probably really slow, but it makes it so that the order of the columns doesn't matter. iCol returns a number.
 	     The below returns instead triggers the logic if the correct column name is triggered.*/
-	    var $grid=$(this);    
-	    var cm = $grid.jqGrid("getGridParam", "colModel");
-	    var colName = cm[iCol].name;
+	    if (iCol > 0) {
+		var $grid=$(this);    
+		var cm = $grid.jqGrid("getGridParam", "colModel");
+		var colName = cm[iCol].name;
 
-	    if(colName === 'shortDir'){
-		var origDirectory = $grid.getCell(rowId,'origDir');
-		var shortOrigDirectory = ShortDirName(origDirectory);
-		if (cellContent === shortOrigDirectory) {
-		    var desktopDir = dirTarget('Desktop');
-		    $grid.setCell(rowId,'directory',desktopDir);
-		    $grid.setCell(rowId,iCol,ShortDirName(desktopDir));
-		} else {
-		    $grid.setCell(rowId,'directory',origDirectory);
-		    $grid.setCell(rowId,iCol,shortOrigDirectory);
+		if(colName === 'shortDir'){
+		    var origDirectory = $grid.getCell(rowId,'origDir');
+		    var shortOrigDirectory = ShortDirName(origDirectory);
+		    if (cellContent === shortOrigDirectory) {
+			var desktopDir = dirTarget('Desktop');
+			$grid.setCell(rowId,'directory',desktopDir);
+			$grid.setCell(rowId,iCol,ShortDirName(desktopDir));
+		    } else {
+			$grid.setCell(rowId,'directory',origDirectory);
+			$grid.setCell(rowId,iCol,shortOrigDirectory);
+		    }
+		    
+ 		    if (fso.FileExists(desktopDir + $grid.getCell(rowId,'partNumber') + ".pdf")) {
+			$grid.setCell(rowId,'fileExists','Exists');
+		    } else {
+			$grid.setCell(rowId,'fileExists','New');
+		    }		
 		}
-		
- 		if (fso.FileExists(desktopDir + $grid.getCell(rowId,'partNumber') + ".pdf")) {
-		    $grid.setCell(rowId,'fileExists','Exists');
-		} else {
-		    $grid.setCell(rowId,'fileExists','New');
-		}		
-	    }
-	    if(colName === 'fileExists'){
-		if(cellContent === 'Exists'){
-		    $grid.setCell(rowId,iCol,'Overwrite');
+		if(colName === 'fileExists'){
+		    if(cellContent === 'Exists'){
+			$grid.setCell(rowId,iCol,'Overwrite');
+		    }
+		    else if(cellContent === "Overwrite" || cellContent === "Released"){
+			$grid.setCell(rowId,iCol,'Exists');
+		    }
 		}
-		else if(cellContent === "Overwrite" || cellContent === "Released"){
-		    $grid.setCell(rowId,iCol,'Exists');
+		if(iCol !== 0){  //This part makes it so that only the first column, the checkboxes is able to select columns.I could have used colName !== 'cb', because cb is apparently the name of the checkbox column.
+		    $grid.setSelection(rowId,false);
 		}
-	    }
-	    if(iCol !== 0){  //This part makes it so that only the first column, the checkboxes is able to select columns.I could have used colName !== 'cb', because cb is apparently the name of the checkbox column.
-		$grid.setSelection(rowId,false);
 	    }
 	}
     });
