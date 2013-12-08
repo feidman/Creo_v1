@@ -36,31 +36,75 @@ $(document).ready(function(){
     $("#ProEOutput").jqGrid({
 	datatype: "local",
 	height: 'auto',
-	width: 1250,
+	width: $(window).width()-$('#howto_button').width()-25,
+	forceFit: true,
 	rowNum: 250,      //This sets the max number of rows possible, if this wasn't here sorting the files shrinks it down to the default 20 vis
-	colNames:['ID','Part Number', 'Description', 'Target Directory', 'Original Directory'],
+	colNames:['Status','Part Number', 'Description', 'Actual Target Directory', 'Original Directory','Target Directory'],
 	colModel:[
-	    {name:'id',index:'id', width:15, sorttype:"int"},
-	    {name:'partNumber',index:'partNumber', width:120},
-	    {name:'description',index:'description', width:350},
-	    {name:'directory',index:'directory', width:200, formatter: function(cellValue) {return ShortDirName(cellValue)}},
-	    {name:'origDir',index:'origDir', hidden:true}
+	    {name:'fileExists',index:'fileExists', width:15, sortable: false,title: false,
+	     cellattr: function(rowId, cValue, rawObject, cm, rdata) {
+		 //The below correctly shows the jquery icon, but it also shows all the jqeuery icons after it too! No good.
+//		 if (cValue === "true") {return '<span class="ui-icon ui-icon-refresh"></span>'; }
+//		 if (cValue === "false") {return '<span class="ui-icon ui-icon-check" title="New Drawing"></span>'; }
+	     }
+	    },
+	    {name:'partNumber',index:'partNumber', width:50, title: false},
+	    {name:'description',index:'description', title: false},
+	    {name:'directory',index:'directory', hidden:true, title: false},
+	    {name:'origDir',index:'origDir', hidden:true, title: false},
+	    {name:'shortDir',index:'shortDir', width:50, title: false,
+	    	     cellattr: function(rowId, cValue, rawObject, cm, rdata) {
+			 if (rawObject.origDir !== dirTarget('Desktop')){
+//			     return 'title= "' + rawObject.origDir + " and " + rawObject.directory +'"';
+//			     return 'style = "font-weight:bold"';
+			     if (rawObject.directory !== rawObject.origDir) {return 'style = "font-weight:bold"';}
+			     else {return 'style = "font-weight:normal"';}
+			 }
+		     }
+	    }
 	],
 	multiselect: true,
 	caption: " ",
 	hiddengrid:true,
+	deselectAfterSort:false,
 	onCellSelect: function(rowId,iCol,cellContent){
-	    if(iCol === 4){
-		var origDirectory = $(this).getCell(rowId,5);
-		var shortOrigDirectory = ShortDirName(origDirectory);
-		if(cellContent === shortOrigDirectory){
-		    $(this).setCell(rowId,iCol,dirTarget("Desktop"));
+	    /*This part is probably really slow, but it makes it so that the order of the columns doesn't matter. iCol returns a number.
+	     The below returns instead triggers the logic if the correct column name is triggered.*/
+	    if (iCol > 0) {
+		var $grid=$(this);
+		var cm = $grid.jqGrid("getGridParam", "colModel");
+		var colName = cm[iCol].name;
+
+		if(colName === 'shortDir'){
+		    var origDirectory = $grid.getCell(rowId,'origDir');
+		    var shortOrigDirectory = ShortDirName(origDirectory);
+		    var desktopDir = dirTarget('Desktop');
+		    if (cellContent === shortOrigDirectory) {
+			$grid.setCell(rowId,'directory',desktopDir);
+			$grid.setCell(rowId,iCol,ShortDirName(desktopDir));
+		    } else {
+			$grid.setCell(rowId,'directory',origDirectory);
+			$grid.setCell(rowId,iCol,shortOrigDirectory);
+		    }
+
+ 		    if (fso.FileExists(desktopDir + $grid.getCell(rowId,'partNumber') + ".pdf")) {
+			$grid.setCell(rowId,'fileExists','Exists');
+		    } else {
+			$grid.setCell(rowId,'fileExists','New');
+		    }
 		}
-		else{
-		    $(this).setCell(rowId,iCol,origDirectory);
+		if(colName === 'fileExists'){
+		    if(cellContent === 'Exists'){
+			$grid.setCell(rowId,iCol,'Overwrite');
+		    }
+		    else if(cellContent === "Overwrite" || cellContent === "Released"){
+			$grid.setCell(rowId,iCol,'Exists');
+		    }
+		}
+		if(iCol !== 0){  //This part makes it so that only the first column, the checkboxes is able to select columns.I could have used colName !== 'cb', because cb is apparently the name of the checkbox column.
+		    $grid.setSelection(rowId,false);
 		}
 	    }
-
 	}
     });
 
@@ -69,7 +113,7 @@ $(document).ready(function(){
 //INITIALIZE CONNECTION TO PRO-E (The window. is javascript syntax to make mGlob and oSession global for use in the DescFromPart function since it's a function decleration its intepreted before this line is ran, so oSession would otherwise be out of scope of DescFromPart.
 window.mGlob = new ActiveXObject("pfc.MpfcCOMGlobal"); //Makes connection to Pro-E
 window.oSession = mGlob.GetProESession();  //Returns reference to current session to oSession
-
+window.fso = new ActiveXObject("Scripting.FileSystemObject"); //This needed to be global so I could populate the FileExists Column in one function and move/delete files in another function.
 //MAIN PROGRAM
 
 //OPENS THE DRW OF THE CURRENTLY OPENED PRT.
@@ -111,11 +155,12 @@ window.oSession = mGlob.GetProESession();  //Returns reference to current sessio
 	   targetDir = dirTarget(currentDrw);
 	   TableData.push(
 	       {
-		   id: i+1,
+		   fileExists: fso.FileExists(targetDir + currentDrw + ".pdf") ? "Exists" : "New",
 		   partNumber: currentDrw,
 		   description: DescFromPart(currentDrw),
 		   directory: targetDir,
 		   origDir: targetDir,
+		   shortDir: ShortDirName(targetDir)
 	       }
 	   );
        }
@@ -129,7 +174,7 @@ window.oSession = mGlob.GetProESession();  //Returns reference to current sessio
     });
 
     $('#pdfApprove').click(function(){
-	var selectedRows = jQuery("#ProEOutput").jqGrid('getGridParam','selarrrow');
+	var selectedRows = $("#ProEOutput").jqGrid('getGridParam','selarrrow');
 	var numSelected = selectedRows.length;
 
 	//Only creates this stuff if anything was selected AKA selection count is greater than 0.
@@ -159,22 +204,30 @@ window.oSession = mGlob.GetProESession();  //Returns reference to current sessio
 	    ColorPDF.Options = SettingsColor;
 
 	    //This stores the original window size to restore it later.
-	    var windowSize = oSession.CurrentWindow.GetBrowserSize();	    
+	    var windowSize = oSession.CurrentWindow.GetBrowserSize();
 	    var DescriptorFactory = new ActiveXObject("pfc.pfcModelDescriptor");
-	    var fso = new ActiveXObject("Scripting.FileSystemObject"); 
 
 	    for(var i=0;i<numSelected;i++){
-		var curDrw = $("#ProEOutput").jqGrid('getRowData', selectedRows[i]);
+		var $grid =  $("#ProEOutput");
+		var actualRowNum = selectedRows[i];
+		var curDrw = $grid.jqGrid('getRowData', actualRowNum);
 		var targetPN = curDrw.partNumber;
-		var targetDescript = DescriptorFactory.Create (new ActiveXObject("pfc.pfcModelType").MDL_DRAWING, targetPN , null);
-		var target = oSession.RetrieveModel(targetDescript);
-//		target.Display();
-//		target.Export(targetPN,ColorPDF);
-//		target.Erase();     //This is commented because it might erase drawings they already have opened and haven't saved.
-		console.log(oSession.GetCurrentDirectory() + targetPN+ ".pdf moved to: " + curDrw.directory + targetPN + ".pdf");
-//		fso.MoveFile(oSession.GetCurrentDirectory() + targetPN+ ".pdf", curDrw.directory + targetPN + ".pdf");
+		var targetOverwrite = curDrw.fileExists;
+		var fullNetworkFile = curDrw.directory + targetPN + ".pdf";
+		var fullNewFile = oSession.GetCurrentDirectory() + targetPN+ ".pdf";
+
+		if (targetOverwrite === "New" | targetOverwrite === "Overwrite"){
+		    var targetDescript = DescriptorFactory.Create (new ActiveXObject("pfc.pfcModelType").MDL_DRAWING, targetPN , null);
+		    var target = oSession.RetrieveModel(targetDescript);
+		    target.Display();
+		    target.Export(targetPN,ColorPDF);
+//		    target.Erase();     //This is commented because it might erase drawings they already have opened and haven't saved.
+		   es if (targetOverwrite === "Overwrite"){fso.deleteFile(fullNetworkFile);}
+		    fso.MoveFile(fullNewFile, fullNetworkFile);
+		    $grid.setCell(actualRowNum,'fileExists','Released');
+		}
 	    }
-	    oSession.CurrentWindow.SetBrowserSize(windowSize);	    
+	    oSession.CurrentWindow.SetBrowserSize(windowSize);
 	}
     });
 
@@ -205,8 +258,13 @@ function ShortName (fullname) {
 
 //This function parses the full target directory down to the final folder that everyone knows.
 function ShortDirName (fullDirectory) {
-    var fullDirName =  fullDirectory.substr(0,fullDirectory.length-1);
-    return fullDirName.slice(fullDirName.lastIndexOf("\\")+1,fullDirName.length);
+    var fullDirName =  fullDirectory.substring(0,fullDirectory.length-1);
+    var critNetwork = fullDirectory.indexOf('\\PDF FILES');
+    if (critNetwork !== -1){
+	fullDirName = fullDirName.substring(0,critNetwork);
+    }
+
+    return fullDirName.slice(fullDirName.lastIndexOf('\\')+1,fullDirName.length);
 }
 
 //This function returns the directory the file should be move to, based on it's part number (example: PRS-P-... would be placed in the P-Pedals folder). If it doesn't recognize it as a model part or FS part, it puts it on te desktop.
@@ -280,16 +338,19 @@ function dirTarget (partNumber) {
     };
 
     //The first check is for FS parts and ensures the crit character is a letter and the
-    if (firstThreeChars==="PRS" && critFSAscii<91 && critFSAscii>64 && partLength<18 && partLength>15) {
+    if (partNumber === 'Desktop'){
+	return targetDesktop + "\\";
+    }
+    else if (firstThreeChars==="PRS" && critFSAscii<91 && critFSAscii>64 && partLength<18 && partLength>15) {
 	//THEN PARSE critFSLetter USING A FULL-SCALE PART SPECIFIC METHOD
-	return targetFS + fsDirs[critFSLetter] + "\\";
+	return targetFS + fsDirs[critFSLetter] + "\\PDF FILES\\";
     }
     else if (firstThreeChars==="PR1" && critModelAscii<91 && critModelAscii>64 && partLength<14 && partLength>11) {
 	//THEN PARSE critModelLetter USING A MODEL PART SPECIFIC METHOD
-	return targetModel + modelDirs[critModelLetter] + "\\";
+	return targetModel + modelDirs[critModelLetter] + "\\PDF FILES\\";
     }
     else {
-	//IT IS NOT PARSABLE AND RETURN "NOT EXPORTING"
+	//IF IT IS NOT PARSABLE AND RETURN "NOT EXPORTING"
 	return targetDesktop + "\\";
     }
 
