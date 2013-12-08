@@ -1,6 +1,6 @@
 $(document).ready(function(){
     //Fades in menus
-    $('div').hide().fadeIn(1000);
+    $('div').hide().fadeIn(2000);
     $('#howto').hide();
     $('#pdfApprove').hide();
 
@@ -9,19 +9,6 @@ $(document).ready(function(){
 	if($('#howto_button').text() === "How-To")
 	{$('#howto_button').fadeOut('fast');}
     }, 10000);
-
-    //Toggles the appearance of the list items - hover(on action, off action)
-    $('li').hover(
-	function(){
-	    $(this).css('color', 'gold');
-	},
-	function(){
-	    $(this).css('color', '');
-	}
-    );
-
-    $('#howto_button').css('cursor','pointer');
-    $('li').css('cursor','pointer');
 
     $('#howto_button').click(function(){
 	if($('#howto_button').text() != "Hide"){
@@ -32,83 +19,6 @@ $(document).ready(function(){
 	$('#howto').slideToggle('fast');
     });
 
-    //jqGrid Definition
-    $("#ProEOutput").jqGrid({
-	datatype: "local",
-	height: 'auto',
-	width: $(window).width()-$('#howto_button').width()-25,
-	forceFit: true,
-	rowNum: 250,      //This sets the max number of rows possible, if this wasn't here sorting the files shrinks it down to the default 20 vis
-	colNames:['Status','Part Number', 'Description', 'Actual Target Directory', 'Original Directory','Target Directory'],
-	colModel:[
-	    {name:'fileExists',index:'fileExists', width:15, sortable: false,title: false,
-	     cellattr: function(rowId, cValue, rawObject, cm, rdata) {
-		 //The below correctly shows the jquery icon, but it also shows all the jqeuery icons after it too! No good.
-//		 if (cValue === "true") {return '<span class="ui-icon ui-icon-refresh"></span>'; }
-//		 if (cValue === "false") {return '<span class="ui-icon ui-icon-check" title="New Drawing"></span>'; }
-	     }
-	    },
-	    {name:'partNumber',index:'partNumber', width:50, title: false},
-	    {name:'description',index:'description', title: false},
-	    {name:'directory',index:'directory', hidden:true, title: false},
-	    {name:'origDir',index:'origDir', hidden:true, title: false},
-	    {name:'shortDir',index:'shortDir', width:50, title: false,
-	    	     cellattr: function(rowId, cValue, rawObject, cm, rdata) {
-			 if (rawObject.origDir !== dirTarget('Desktop')){
-//			     return 'title= "' + rawObject.origDir + " and " + rawObject.directory +'"';
-//			     return 'style = "font-weight:bold"';
-			     if (rawObject.directory !== rawObject.origDir) {return 'style = "font-weight:bold"';}
-			     else {return 'style = "font-weight:normal"';}
-			 }
-		     }
-	    }
-	],
-	multiselect: true,
-	caption: " ",
-	hiddengrid:true,
-	deselectAfterSort:false,
-	onCellSelect: function(rowId,iCol,cellContent){
-	    /*This part is probably really slow, but it makes it so that the order of the columns doesn't matter. iCol returns a number.
-	     The below returns instead triggers the logic if the correct column name is triggered.*/
-	    if (iCol > 0) {
-		var $grid=$(this);
-		var cm = $grid.jqGrid("getGridParam", "colModel");
-		var colName = cm[iCol].name;
-
-		if(colName === 'shortDir'){
-		    var origDirectory = $grid.getCell(rowId,'origDir');
-		    var shortOrigDirectory = ShortDirName(origDirectory);
-		    var desktopDir = dirTarget('Desktop');
-		    if (cellContent === shortOrigDirectory) {
-			$grid.setCell(rowId,'directory',desktopDir);
-			$grid.setCell(rowId,iCol,ShortDirName(desktopDir));
-		    } else {
-			$grid.setCell(rowId,'directory',origDirectory);
-			$grid.setCell(rowId,iCol,shortOrigDirectory);
-		    }
-
- 		    if (fso.FileExists(desktopDir + $grid.getCell(rowId,'partNumber') + ".pdf")) {
-			$grid.setCell(rowId,'fileExists','Exists');
-		    } else {
-			$grid.setCell(rowId,'fileExists','New');
-		    }
-		}
-		if(colName === 'fileExists'){
-		    if(cellContent === 'Exists'){
-			$grid.setCell(rowId,iCol,'Overwrite');
-		    }
-		    else if(cellContent === "Overwrite" || cellContent === "Released"){
-			$grid.setCell(rowId,iCol,'Exists');
-		    }
-		}
-		if(iCol !== 0){  //This part makes it so that only the first column, the checkboxes is able to select columns.I could have used colName !== 'cb', because cb is apparently the name of the checkbox column.
-		    $grid.setSelection(rowId,false);
-		}
-	    }
-	}
-    });
-
-    $("#ProEOutput").parents('div.ui-jqgrid-bdiv').css("max-height","540px");
 
 //INITIALIZE CONNECTION TO PRO-E (The window. is javascript syntax to make mGlob and oSession global for use in the DescFromPart function since it's a function decleration its intepreted before this line is ran, so oSession would otherwise be out of scope of DescFromPart.
 window.mGlob = new ActiveXObject("pfc.MpfcCOMGlobal"); //Makes connection to Pro-E
@@ -142,35 +52,108 @@ window.fso = new ActiveXObject("Scripting.FileSystemObject"); //This needed to b
 //CREATES A DRW OF THE CURRENTLY OPENED PRT
     $('#ExportDrw').click(function(){
 
-       var ServerHandle = oSession.GetActiveServer();
-       var OpenOptions = new ActiveXObject("pfc.pfcFileListOpt").FILE_LIST_LATEST;
-       var Dir = "wtws://" + ServerHandle.Alias + "/" + ServerHandle.ActiveWorkspace;
-       var DrwSeq = oSession.ListFiles("*.drw",OpenOptions,Dir); //This gives you a Pro-E "sequence" of strings. Each item, accessed using .Item(i) is the string.
+	var ServerHandle = oSession.GetActiveServer();
+	var OpenOptions = new ActiveXObject("pfc.pfcFileListOpt").FILE_LIST_LATEST;
+	var Dir = "wtws://" + ServerHandle.Alias + "/" + ServerHandle.ActiveWorkspace;
+	var DrwSeq = oSession.ListFiles("*.drw",OpenOptions,Dir); //This gives you a Pro-E "sequence" of strings. Each item, accessed using .Item(i) is the string.
 
-       //This section constructs an array full of each row of the selection table.
-       var TableData = [];
-       var numDrws = DrwSeq.Count;
-       for (var i = 0; i < numDrws; i++) {
-	   var currentDrw = ShortName(DrwSeq.Item(i));
-	   targetDir = dirTarget(currentDrw);
-	   TableData.push(
-	       {
-		   fileExists: fso.FileExists(targetDir + currentDrw + ".pdf") ? "Exists" : "New",
-		   partNumber: currentDrw,
-		   description: DescFromPart(currentDrw),
-		   directory: targetDir,
-		   origDir: targetDir,
-		   shortDir: ShortDirName(targetDir)
-	       }
-	   );
-       }
+	//This section constructs an array full of each row of the selection table.
+	var TableData = [];
+	var numDrws = DrwSeq.Count;
+	for (var i = 0; i < numDrws; i++) {
+	    var currentDrw = ShortName(DrwSeq.Item(i));
+	    targetDir = dirTarget(currentDrw);
+	    TableData.push(
+		{
+		    fileExists: fso.FileExists(targetDir + currentDrw + ".pdf") ? "Exists" : "New",
+		    partNumber: currentDrw,
+		    description: DescFromPart(currentDrw),
+		    directory: targetDir,
+		    origDir: targetDir,
+		    shortDir: ShortDirName(targetDir)
+		}
+	    );
+	}
 
-       jQuery("#ProEOutput").jqGrid('setCaption',"Drawings in Current Workspace");
-       $('#ProEOutput').jqGrid('clearGridData');   //Clears the grid before repopulating it.
-       for(var i=0;i<TableData.length;i++)
-	   $("#ProEOutput").jqGrid('addRowData',TableData[i].id,TableData[i]);
-       $("#ProEOutput").jqGrid('setGridState','visible');
-       $("#pdfApprove").show();
+	//jqGrid Definition
+	$("#ProEOutput").jqGrid({
+	    datatype: "local",
+	    gridview: true,
+	    data: TableData,
+	    height: 'auto',
+	    width: $(window).width()-$('#howto_button').width()-25,
+	    forceFit: true,
+	    rowNum: 250,      //This sets the max number of rows possible, if this wasn't here sorting the files shrinks it down to the default 20 vis
+	    colNames:['Status','Part Number', 'Description', 'Actual Target Directory', 'Original Directory','Target Directory'],
+	    colModel:[
+		{name:'fileExists',index:'fileExists', width:15, sortable: false,title: false,
+		 cellattr: function(rowId, cValue, rawObject, cm, rdata) {
+		     //The below correctly shows the jquery icon, but it also shows all the jqeuery icons after it too! No good.
+//		    		 if (cValue === "Exists") {return '<span class="ui-icon ui-icon-refresh"></span>'; }
+//		    		 if (cValue === "New") {return '<span class="ui-icon ui-icon-check" title="New Drawing"></span>'; }
+		 }
+		},
+		{name:'partNumber',index:'partNumber', width:50, title: false},
+		{name:'description',index:'description', title: false},
+		{name:'directory',index:'directory', hidden:true, title: false},
+		{name:'origDir',index:'origDir', hidden:true, title: false},
+		{name:'shortDir',index:'shortDir', width:50, title: false,
+	    	 cellattr: function(rowId, cValue, rawObject, cm, rdata) {
+		     if (rawObject.origDir !== dirTarget('Desktop')){
+			 //			     return 'title= "' + rawObject.origDir + " and " + rawObject.directory +'"';
+			 //			     return 'style = "font-weight:bold"';
+			 if (rawObject.directory !== rawObject.origDir) {return 'style = "font-weight:bold"';}
+			 else {return 'style = "font-weight:normal"';}
+		     }
+		 }
+		}
+	    ],
+	    multiselect: true,
+	    caption: "Drawings in Current Workspace",
+	    deselectAfterSort:false,
+	    onCellSelect: function(rowId,iCol,cellContent){
+		/*This part is probably really slow, but it makes it so that the order of the columns doesn't matter. iCol returns a number.
+		  The below returns instead triggers the logic if the correct column name is triggered.*/
+		if (iCol > 0) {
+		    var $grid=$(this);
+		    var cm = $grid.jqGrid("getGridParam", "colModel");
+		    var colName = cm[iCol].name;
+
+		    if(colName === 'shortDir'){
+			var origDirectory = $grid.getCell(rowId,'origDir');
+			var shortOrigDirectory = ShortDirName(origDirectory);
+			var desktopDir = dirTarget('Desktop');
+			if (cellContent === shortOrigDirectory) {
+			    $grid.setCell(rowId,'directory',desktopDir);
+			    $grid.setCell(rowId,iCol,ShortDirName(desktopDir));
+			} else {
+			    $grid.setCell(rowId,'directory',origDirectory);
+			    $grid.setCell(rowId,iCol,shortOrigDirectory);
+			}
+
+ 			if (fso.FileExists(desktopDir + $grid.getCell(rowId,'partNumber') + ".pdf")) {
+			    $grid.setCell(rowId,'fileExists','Exists');
+			} else {
+			    $grid.setCell(rowId,'fileExists','New');
+			}
+		    }
+		    if(colName === 'fileExists'){
+			if(cellContent === 'Exists'){
+			    $grid.setCell(rowId,iCol,'Overwrite');
+			}
+			else if(cellContent === "Overwrite" || cellContent === "Released"){
+			    $grid.setCell(rowId,iCol,'Exists');
+			}
+		    }
+		    if(iCol !== 0){  //This part makes it so that only the first column, the checkboxes is able to select columns.I could have used colName !== 'cb', because cb is apparently the name of the checkbox column.
+			$grid.setSelection(rowId,false);
+		    }
+		}
+	    }
+	});
+
+	$("#ProEOutput").parents('div.ui-jqgrid-bdiv').css("max-height","540px");
+	$("#pdfApprove").show();
     });
 
     $('#pdfApprove').click(function(){
