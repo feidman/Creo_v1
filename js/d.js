@@ -19,13 +19,6 @@ $(document).ready(function(){
 	$('#howto').slideToggle('fast');
     });
 
-
-//INITIALIZE CONNECTION TO PRO-E (The window. is javascript syntax to make mGlob and oSession global for use in the DescFromPart function since it's a function decleration its intepreted before this line is ran, so oSession would otherwise be out of scope of DescFromPart.
-window.mGlob = new ActiveXObject("pfc.MpfcCOMGlobal"); //Makes connection to Pro-E
-window.oSession = mGlob.GetProESession();  //Returns reference to current session to oSession
-window.fso = new ActiveXObject("Scripting.FileSystemObject"); //This needed to be global so I could populate the FileExists Column in one function and move/delete files in another function.
-//MAIN PROGRAM
-
 //OPENS THE DRW OF THE CURRENTLY OPENED PRT.
     $('#OpenDrw').click(function(){
 	try{
@@ -49,6 +42,13 @@ window.fso = new ActiveXObject("Scripting.FileSystemObject"); //This needed to b
 	}
     });
 
+//----------------------------------MAIN PROGRAM-------------------------------------------------------------------------------------------
+
+//INITIALIZE CONNECTION TO PRO-E (The window. is javascript syntax to make mGlob and oSession global for use in the DescFromPart function since it's a function decleration its intepreted before this line is ran, so oSession would otherwise be out of scope of DescFromPart.
+window.mGlob = new ActiveXObject("pfc.MpfcCOMGlobal"); //Makes connection to Pro-E
+window.oSession = mGlob.GetProESession();  //Returns reference to current session to oSession
+window.fso = new ActiveXObject("Scripting.FileSystemObject"); //This needed to be global so I could populate the FileExists Column in one function and move/delete files in another function.
+
 //CREATES A DRW OF THE CURRENTLY OPENED PRT
     $('#ExportDrw').click(function(){
 
@@ -65,7 +65,8 @@ window.fso = new ActiveXObject("Scripting.FileSystemObject"); //This needed to b
 	    targetDir = dirTarget(currentDrw);
 	    TableData.push(
 		{
-		    fileExists: fso.FileExists(targetDir + currentDrw + ".pdf") ? "Exists" : "New",
+		    fileExists: fso.FileExists(targetDir + currentDrw + '.pdf') ? 'Exists' : 'New',
+		    colorSetting: 'Gray',
 		    partNumber: currentDrw,
 		    description: DescFromPart(currentDrw),
 		    directory: targetDir,
@@ -84,7 +85,7 @@ window.fso = new ActiveXObject("Scripting.FileSystemObject"); //This needed to b
 	    width: $(window).width()-$('#howto_button').width()-25,
 	    forceFit: true,
 	    rowNum: 250,      //This sets the max number of rows possible, if this wasn't here sorting the files shrinks it down to the default 20 vis
-	    colNames:['Status','Part Number', 'Description', 'Actual Target Directory', 'Original Directory','Target Directory'],
+	    colNames:['Status','Color','Part Number', 'Description', 'Actual Target Directory', 'Original Directory','Target Directory'],
 	    colModel:[
 		{name:'fileExists',index:'fileExists', width:15, sortable: false,title: false,
 		 cellattr: function(rowId, cValue, rawObject, cm, rdata) {
@@ -93,6 +94,7 @@ window.fso = new ActiveXObject("Scripting.FileSystemObject"); //This needed to b
 //		    		 if (cValue === "New") {return '<span class="ui-icon ui-icon-check" title="New Drawing"></span>'; }
 		 }
 		},
+		{name:'colorSetting',index:'colorSetting', width:15, title: false},
 		{name:'partNumber',index:'partNumber', width:50, title: false},
 		{name:'description',index:'description', title: false},
 		{name:'directory',index:'directory', hidden:true, title: false},
@@ -119,6 +121,7 @@ window.fso = new ActiveXObject("Scripting.FileSystemObject"); //This needed to b
 		    var cm = $grid.jqGrid("getGridParam", "colModel");
 		    var colName = cm[iCol].name;
 
+		    //Controls Toggling the Target Directory
 		    if(colName === 'shortDir'){
 			var origDirectory = $grid.getCell(rowId,'origDir');
 			var shortOrigDirectory = ShortDirName(origDirectory);
@@ -137,6 +140,8 @@ window.fso = new ActiveXObject("Scripting.FileSystemObject"); //This needed to b
 			    $grid.setCell(rowId,'fileExists','New');
 			}
 		    }
+
+		    //Controls Toggling the File Overwrite Settings
 		    if(colName === 'fileExists'){
 			if(cellContent === 'Exists'){
 			    $grid.setCell(rowId,iCol,'Overwrite');
@@ -145,7 +150,22 @@ window.fso = new ActiveXObject("Scripting.FileSystemObject"); //This needed to b
 			    $grid.setCell(rowId,iCol,'Exists');
 			}
 		    }
-		    if(iCol !== 0){  //This part makes it so that only the first column, the checkboxes is able to select columns.I could have used colName !== 'cb', because cb is apparently the name of the checkbox column.
+
+		    //Controls toggling the Color Settings
+		    if(colName === 'colorSetting'){
+			if(cellContent === 'Mono'){
+			    $grid.setCell(rowId,iCol,'Color');
+			}
+			else if(cellContent === 'Color'){
+			    $grid.setCell(rowId,iCol,'Gray');
+			}
+			else {
+			    $grid.setCell(rowId,iCol,'Mono');
+			}
+		    }
+
+		    //Controls which columns can cause row selection, 0 is the checkbox column
+		    if(iCol !== 0){  
 			$grid.setSelection(rowId,false);
 		    }
 		}
@@ -164,10 +184,12 @@ window.fso = new ActiveXObject("Scripting.FileSystemObject"); //This needed to b
 	if (numSelected > 0){
 
 	    //This section before the for loop creates all the possible options. They have to be here to be within scope.
-	    var ColorPDF = new ActiveXObject("pfc.pfcPDFExportInstructions").Create();
 	    var MonoPDF = new ActiveXObject("pfc.pfcPDFExportInstructions").Create();
+	    var ColorPDF = new ActiveXObject("pfc.pfcPDFExportInstructions").Create();
+	    var GrayPDF = new ActiveXObject("pfc.pfcPDFExportInstructions").Create();
 	    var SettingsMono = new ActiveXObject("pfc.pfcPDFOptions");
 	    var SettingsColor = new ActiveXObject("pfc.pfcPDFOptions");
+	    var SettingsGray = new ActiveXObject("pfc.pfcPDFOptions");
 	    var OptionFactory = new ActiveXObject("pfc.pfcPDFOption");
 
 	    //The below creates the setting that stops Pro-E from opening the PDF viewer when it saves a PDF.
@@ -176,18 +198,24 @@ window.fso = new ActiveXObject("Scripting.FileSystemObject"); //This needed to b
 	    SettingViewerOFF.OptionValue = new ActiveXObject("pfc.MpfcArgument").CreateBoolArgValue(false);   //The documentation mentions the method .setOptionValue, leaving out set made it work for me.
 	    SettingsColor.Append(SettingViewerOFF);
 	    SettingsMono.Append(SettingViewerOFF);
+	    SettingsGray.Append(SettingViewerOFF);
 
-	    //The below creates the setting to make the colors black and white. By default it's color, so I only have to add the Mono seting to the SettingsMono object.
-	    var ColorSetting = OptionFactory.Create();
-	    ColorSetting.OptionType = new ActiveXObject("pfc.pfcPDFOptionType").PDFOPT_COLOR_DEPTH;
-	    ColorSetting.OptionValue = new ActiveXObject("pfc.MpfcArgument").CreateIntArgValue(new ActiveXObject("pfc.pfcPDFColorDepth").PDF_CD_MONO);
-	    SettingsMono.Append(ColorSetting);
+	    //The below creates the setting to make the PDF export in mono or gray scale.  By default it's color, so I only have to add the Mono seting to the SettingsMono object.
+	    var MonoSetting = OptionFactory.Create();
+	    MonoSetting.OptionType = new ActiveXObject("pfc.pfcPDFOptionType").PDFOPT_COLOR_DEPTH;
+	    MonoSetting.OptionValue = new ActiveXObject("pfc.MpfcArgument").CreateIntArgValue(new ActiveXObject("pfc.pfcPDFColorDepth").PDF_CD_MONO);
+	    SettingsMono.Append(MonoSetting);
+
+	    var GraySetting = OptionFactory.Create();
+	    GraySetting.OptionType = new ActiveXObject("pfc.pfcPDFOptionType").PDFOPT_COLOR_DEPTH;
+	    GraySetting.OptionValue = new ActiveXObject("pfc.MpfcArgument").CreateIntArgValue(new ActiveXObject("pfc.pfcPDFColorDepth").PDF_CD_GRAY);
+	    SettingsGray.Append(GraySetting);
 
 	    MonoPDF.Options = SettingsMono;
 	    ColorPDF.Options = SettingsColor;
+	    GrayPDF.Options = SettingsGray;
 
-	    //This stores the original window size to restore it later.
-	    var windowSize = oSession.CurrentWindow.GetBrowserSize();
+	    var windowSize = oSession.CurrentWindow.GetBrowserSize();	    //This stores the original window size to restore it later.
 	    var DescriptorFactory = new ActiveXObject("pfc.pfcModelDescriptor");
 
 	    for(var i=0;i<numSelected;i++){
@@ -198,12 +226,23 @@ window.fso = new ActiveXObject("Scripting.FileSystemObject"); //This needed to b
 		var targetOverwrite = curDrw.fileExists;
 		var fullNetworkFile = curDrw.directory + targetPN + ".pdf";
 		var fullNewFile = oSession.GetCurrentDirectory() + targetPN+ ".pdf";
+		var desiredColor = curDrw.colorSetting;
+		var PDFSetting = null;
 
 		if (targetOverwrite === "New" | targetOverwrite === "Overwrite"){
+
+		    if(desiredColor === 'Gray') {
+			PDFSetting = GrayPDF;
+		    } else if (desiredColor === 'Mono'){
+			PDFSetting = MonoPDF;
+		    } else {
+			PDFSetting = ColorPDF;
+		    }
+
 		    var targetDescript = DescriptorFactory.Create (new ActiveXObject("pfc.pfcModelType").MDL_DRAWING, targetPN , null);
 		    var target = oSession.RetrieveModel(targetDescript);
 		    target.Display();
-		    target.Export(targetPN,ColorPDF);
+		    target.Export(targetPN,PDFSetting);
 //		    target.Erase();     //This is commented because it might erase drawings they already have opened and haven't saved.
 		    if (targetOverwrite === "Overwrite"){fso.deleteFile(fullNetworkFile);}
 		    fso.MoveFile(fullNewFile, fullNetworkFile);
