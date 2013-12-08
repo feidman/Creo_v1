@@ -39,9 +39,8 @@ $(document).ready(function(){
 	width: $(window).width()-$('#howto_button').width()-25,
 	forceFit: true,
 	rowNum: 250,      //This sets the max number of rows possible, if this wasn't here sorting the files shrinks it down to the default 20 vis
-	colNames:['ID','Status','Part Number', 'Description', 'Actual Target Directory', 'Original Directory','Target Directory'],
+	colNames:['Status','Part Number', 'Description', 'Actual Target Directory', 'Original Directory','Target Directory'],
 	colModel:[
-	    {name:'id',index:'id', width:15, sorttype:"int", title: false, hidden:true},
 	    {name:'fileExists',index:'fileExists', width:15, sortable: false,title: false,
 	     cellattr: function(rowId, cValue, rawObject, cm, rdata) {
 		 //The below correctly shows the jquery icon, but it also shows all the jqeuery icons after it too! No good.
@@ -72,27 +71,27 @@ $(document).ready(function(){
 	    /*This part is probably really slow, but it makes it so that the order of the columns doesn't matter. iCol returns a number.
 	     The below returns instead triggers the logic if the correct column name is triggered.*/
 	    if (iCol > 0) {
-		var $grid=$(this);    
+		var $grid=$(this);
 		var cm = $grid.jqGrid("getGridParam", "colModel");
 		var colName = cm[iCol].name;
 
 		if(colName === 'shortDir'){
 		    var origDirectory = $grid.getCell(rowId,'origDir');
 		    var shortOrigDirectory = ShortDirName(origDirectory);
+		    var desktopDir = dirTarget('Desktop');
 		    if (cellContent === shortOrigDirectory) {
-			var desktopDir = dirTarget('Desktop');
 			$grid.setCell(rowId,'directory',desktopDir);
 			$grid.setCell(rowId,iCol,ShortDirName(desktopDir));
 		    } else {
 			$grid.setCell(rowId,'directory',origDirectory);
 			$grid.setCell(rowId,iCol,shortOrigDirectory);
 		    }
-		    
+
  		    if (fso.FileExists(desktopDir + $grid.getCell(rowId,'partNumber') + ".pdf")) {
 			$grid.setCell(rowId,'fileExists','Exists');
 		    } else {
 			$grid.setCell(rowId,'fileExists','New');
-		    }		
+		    }
 		}
 		if(colName === 'fileExists'){
 		    if(cellContent === 'Exists'){
@@ -156,7 +155,6 @@ window.fso = new ActiveXObject("Scripting.FileSystemObject"); //This needed to b
 	   targetDir = dirTarget(currentDrw);
 	   TableData.push(
 	       {
-		   id: i+1,
 		   fileExists: fso.FileExists(targetDir + currentDrw + ".pdf") ? "Exists" : "New",
 		   partNumber: currentDrw,
 		   description: DescFromPart(currentDrw),
@@ -206,7 +204,7 @@ window.fso = new ActiveXObject("Scripting.FileSystemObject"); //This needed to b
 	    ColorPDF.Options = SettingsColor;
 
 	    //This stores the original window size to restore it later.
-	    var windowSize = oSession.CurrentWindow.GetBrowserSize();	    
+	    var windowSize = oSession.CurrentWindow.GetBrowserSize();
 	    var DescriptorFactory = new ActiveXObject("pfc.pfcModelDescriptor");
 
 	    for(var i=0;i<numSelected;i++){
@@ -217,19 +215,19 @@ window.fso = new ActiveXObject("Scripting.FileSystemObject"); //This needed to b
 		var targetOverwrite = curDrw.fileExists;
 		var fullNetworkFile = curDrw.directory + targetPN + ".pdf";
 		var fullNewFile = oSession.GetCurrentDirectory() + targetPN+ ".pdf";
-		
+
 		if (targetOverwrite === "New" | targetOverwrite === "Overwrite"){
 		    var targetDescript = DescriptorFactory.Create (new ActiveXObject("pfc.pfcModelType").MDL_DRAWING, targetPN , null);
 		    var target = oSession.RetrieveModel(targetDescript);
 		    target.Display();
 		    target.Export(targetPN,ColorPDF);
 //		    target.Erase();     //This is commented because it might erase drawings they already have opened and haven't saved.
-		    if (targetOverwrite === "Overwrite"){fso.deleteFile(fullNetworkFile);}
+		   es if (targetOverwrite === "Overwrite"){fso.deleteFile(fullNetworkFile);}
 		    fso.MoveFile(fullNewFile, fullNetworkFile);
 		    $grid.setCell(actualRowNum,'fileExists','Released');
 		}
 	    }
-	    oSession.CurrentWindow.SetBrowserSize(windowSize);	    
+	    oSession.CurrentWindow.SetBrowserSize(windowSize);
 	}
     });
 
