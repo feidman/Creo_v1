@@ -113,6 +113,58 @@ window.fso = new ActiveXObject("Scripting.FileSystemObject"); //This needed to b
 	    multiselect: true,
 	    caption: "Drawings in Current Workspace",
 	    deselectAfterSort:false,
+	    onSortCol: function(index,iCol,sortorder){
+		var $grid=$(this);
+		var cm = $grid.jqGrid("getGridParam", "colModel");
+		var numDrw = $grid.jqGrid('getGridParam', 'records');
+		var colName = cm[iCol].name;
+
+		if (colName === 'colorSetting'){
+		    var firstColSetting = $grid.getCell(1,'colorSetting');
+		    if (firstColSetting === 'Mono') {
+			for(var i=1;i<=numDrw;i++){
+			    $grid.setCell(i,'colorSetting','Color');
+			}
+		    } else if (firstColSetting === 'Color') {
+			for(var i=1;i<=numDrw;i++){
+			    $grid.setCell(i,'colorSetting','Gray');
+			}
+		    } else {
+			for(var i=1;i<=numDrw;i++){
+			    $grid.setCell(i,'colorSetting','Mono');
+			}
+		    }
+		    return 'stop';
+		}
+
+		if (colName === 'shortDir'){
+		    //This determines which way to toggles the target directory
+		    var toggle = false;
+		    var longDesktopDir = dirTarget('Desktop');
+		    var shortDesktopDir = ShortDirName(longDesktopDir);
+		    for(var i=1;i<=numDrw;i++){
+			if ($grid.getCell(i,'shortDir') !== shortDesktopDir) {
+			    toggle = true;
+			}
+		    }
+		    
+		    //This is the part that actually toggles the shortDir column
+		    if (toggle === true) {
+			for(var i=1;i<=numDrw;i++){
+			    $grid.setCell(i,'directory', longDesktopDir);
+			    $grid.setCell(i,'shortDir', shortDesktopDir);
+			}
+		    } else {
+			for(var i=1;i<=numDrw;i++){
+			    var originalDir = $grid.getCell(i,'origDir');
+			    $grid.setCell(i,'directory', originalDir);
+			    $grid.setCell(i,'shortDir', ShortDirName(originalDir));
+			}
+		    }
+
+		    return 'stop';   //this part stops the clicking of the column from actually sorting it.
+		}
+	    },
 	    onCellSelect: function(rowId,iCol,cellContent){
 		/*This part is probably really slow, but it makes it so that the order of the columns doesn't matter. iCol returns a number.
 		  The below returns instead triggers the logic if the correct column name is triggered.*/
