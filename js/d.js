@@ -66,7 +66,7 @@ window.fso = new ActiveXObject("Scripting.FileSystemObject"); //This needed to b
 	    TableData.push(
 		{
 		    fileExists: fso.FileExists(targetDir + currentDrw + '.pdf') ? 'Exists' : 'New',
-		    colorSetting: 'Gray',
+		    colorSetting: 'Color',
 		    partNumber: currentDrw,
 		    description: DescFromPart(currentDrw),
 		    directory: targetDir,
