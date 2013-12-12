@@ -279,7 +279,7 @@ window.fso = new ActiveXObject("Scripting.FileSystemObject"); //This needed to b
 		var fullNetworkFile = curDrw.directory + targetPN + ".pdf";
 		var fullNewFile = oSession.GetCurrentDirectory() + targetPN+ ".pdf";
 		var desiredColor = curDrw.colorSetting;
-		var PDFSetting = null;
+		var PDFSetting = undefined;
 
 		if (targetOverwrite === "New" | targetOverwrite === "Overwrite"){
 
