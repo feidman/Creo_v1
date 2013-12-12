@@ -2,7 +2,7 @@ Creo_v1
 =======
 
 This is a simple webpage designed to provide Creo automation through PTC's integrated Pro/Weblink API. 
-The site is hosted using github pages at: [dev.okdane.com](http://www.dev.okdane.com)
+The site is hosted using github pages at: [dev.okdane.com](http://dev.okdane.com)
 
 -Current Status-
 I've worked through several of the non-trivial cases (atleast non-trivial to me). This included:
