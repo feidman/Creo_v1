@@ -4,6 +4,8 @@ Creo_v1
 This is a simple webpage designed to provide automation to tedious Creo tasks through PTC's integrated Pro/Weblink API.
 The site is hosted temporarily hosted at: [dev.okdane.com](http://dev.okdane.com)
 
+![Creo_v1 Screenshot](/pic/screenshot_Creo_v1.png)
+
 **Current Status**
 
 I've worked through several of the non-trivial cases (atleast non-trivial to me). This included:
