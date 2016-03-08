@@ -2,9 +2,18 @@ Creo_v1
 =======
 
 This is a simple webpage designed to provide automation to tedious Creo tasks through PTC's integrated Pro/Weblink API.
-The site is hosted temporarily hosted at: [dev.okdane.com](http://dev.okdane.com)
 
+The first automation task attempted was automatically savind drawing PDFs. To that end, When the "EXPORT DRAWINGS" link is clicked, a table appears populated with all the drawings currently in your Windchill workspace. Based on the part number, the program will determine the correct directory location for the file and determine if a PDF of that drawing already exists there. The three options available for each drawing are: Color (Color or Black-and-White), where to save the PDF to (Dekstop or Automatic Directory), and whether to overwite the existing PDF or not. 
+
+The drawing exports functionality is actually very full featured and could be easily expanded to work on STL files for rapid prototyping. 
+
+The site WAS hosted temporarily hosted at: [dev.okdane.com](http://dev.okdane.com). To get it working locally on your computer, just change the jQuery CDN url to "http:" instead of "https:" int index.html.
+
+**Screenshots**
 ![Creo_v1 Screenshot](/pic/screenshot_Creo_v1.png)
+
+PDF Release Table
+![Creo_v1 Screenshot](/pic/screenshot_Release_Table.png)
 
 **Current Status**
 
